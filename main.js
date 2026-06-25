@@ -1233,6 +1233,17 @@ document.addEventListener('DOMContentLoaded', () => {
             const interestRadio = document.querySelector('input[name="interest"]:checked');
             const interest = interestRadio ? interestRadio.value : 'Не вказано';
 
+            const TELEGRAM_BOT_TOKEN = '8944016356:AAEhgrts5aQ4JfBs3FW5_nfjnI2MvYhSQXs';
+            const TELEGRAM_CHAT_ID = '1121951611';
+
+            // Формуємо повідомлення
+            let text = `🔥 <b>Нова заявка з сайту Рудий Кіт!</b>\n\n`;
+            text += `🏠 <b>Цікавить:</b> ${interest}\n`;
+            text += `👤 <b>Ім'я:</b> ${name}\n`;
+            text += `📞 <b>Телефон:</b> ${phone}\n`;
+            if (email) text += `✉️ <b>Email:</b> ${email}\n`;
+            if (message) text += `💬 <b>Повідомлення:</b>\n${message}`;
+
             const submitBtn = contactForm.querySelector('button[type="submit"]');
             const originalBtnText = submitBtn.innerHTML;
             
@@ -1241,18 +1252,16 @@ document.addEventListener('DOMContentLoaded', () => {
             formStatus.style.display = 'none';
 
             try {
-                // Відправляємо дані на наш Python сервер
-                const response = await fetch('/api/contact', {
+                // Відправляємо дані безпосередньо в Telegram API
+                const response = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
-                        name: name,
-                        phone: phone,
-                        email: email,
-                        message: message,
-                        interest: interest
+                        chat_id: TELEGRAM_CHAT_ID,
+                        text: text,
+                        parse_mode: 'HTML'
                     })
                 });
 
