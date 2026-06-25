@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Каталог об'єктів нерухомості агенції «Рудий Кіт».">
+    <title>Об'єкти — Агенція нерухомості «Рудий Кіт»</title>
+    <link rel="icon" type="image/png" href="./logo.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body style="padding-top: 80px;">
+
+<!-- Header -->
+<header class="header">
+    <div class="container header__inner">
+        <a href="index.html" class="logo">
+            <img src="./logo.png" alt="Рудий Кіт Логотип">
+            <span>Рудий Кіт</span>
+        </a>
+        
+        <nav class="nav">
+            <ul class="nav__list">
+                <li><a href="index.html" class="nav__link">Головна</a></li>
+                <li><a href="catalog.html" class="nav__link active">Об'єкти</a></li>
+                <li><a href="index.html#team" class="nav__link">Команда</a></li>
+            </ul>
+        </nav>
+        
+        <a href="#footer" class="btn btn--primary header__cta">Залишити заявку</a>
+        
+        <button class="menu-toggle" aria-label="Відкрити меню">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+    </div>
+</header>
+
+<!-- Catalog Header with Search -->
+<section class="catalog-header bg-light" style="padding: 4rem 0 2rem; position: relative; z-index: 10;">
+    <div class="container text-center">
+        <h1 class="section__title fade-in" style="margin-bottom: 2rem;">Пошук об'єктів</h1>
+        
+        <div class="hero-search slide-up" style="margin: 0 auto; box-shadow: 0 4px 20px rgba(0,0,0,0.05);">
+            <div class="hero-search__bar">
+                <div class="hero-search__input-wrapper" style="position: relative;">
+                    <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                    <input type="text" id="search-input" placeholder="Район, вулиця або ЖК..." class="hero-search__input" autocomplete="off">
+                    <ul class="hero-search__dropdown" id="search-dropdown"></ul>
+                </div>
+                <button class="btn btn--primary hero-search__btn">Шукати</button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Properties Section -->
+<section id="properties" class="properties section bg-light" style="padding-top: 0;">
+    <div class="container">
+        
+        <div class="filters fade-in">
+            <button class="filter-btn active" data-filter="all">Всі</button>
+            <button class="filter-btn" data-filter="apartment">Квартири</button>
+            <button class="filter-btn" data-filter="house">Будинки</button>
+            <button class="filter-btn" data-filter="land">Ділянки</button>
+            <button class="filter-btn" data-filter="commercial">Комерція</button>
+        </div>
+        
+        <div class="properties__grid">
+<div class="property-card fade-in" data-category="apartment" style="transition-delay: 0s;">
+    <div class="property-card__image-wrapper">
+        <img src="https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?q=80&w=600&auto=format&fit=crop" alt="3-кімн. квартира з ремонтом в центрі" class="property-card__image">
+        <div class="prop-badges-top">
+            <span class="prop-tag" style="background-color: var(--clr-primary);">Нове</span>
+            <span class="prop-type-badge">Квартира</span>
+        </div>
+        <button class="prop-fav-btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg></button>
+    </div>
+    <div class="property-card__content">
+        <div class="prop-price-row">
+            <span class="prop-price">75 000 USD</span>
+            <span class="prop-price-m2">$1000/м²</span>
+        </div>
+        <h3 class="property-card__title">3-кімн. квартира з ремонтом в центрі</h3>
+        <div class="prop-location"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg> вул. Соборна, 45, Центр</div>
+        <div class="prop-specs">
+<span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9h18v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9zm0 0V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v4"></path></svg> 3 кімн.</span><span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 10v9a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-9"></path><path d="M22 10H2"></path><path d="M7 6v4"></path><path d="M17 6v4"></path><path d="M12 2v8"></path></svg> 1</span><span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 3H3v18h18V3z"></path><path d="M21 3l-18 18"></path></svg> 75 м²</span>        </div>
+        <div class="prop-extra">4/9 поверх</div>
+        <button class="btn btn--primary prop-btn-full">Детальніше</button>
+    </div>
+</div>
+<div class="property-card fade-in" data-category="apartment" style="transition-delay: 0.1s;">
+    <div class="property-card__image-wrapper">
+        <img src="https://images.unsplash.com/photo-1502672260266-1c1e52504437?q=80&w=600&auto=format&fit=crop" alt="2-кімн. квартира у новобудові" class="property-card__image">
+        <div class="prop-badges-top">
+            <span class="prop-tag" style="background-color: #8b3e3e;">Гаряча пропозиція</span>
+            <span class="prop-type-badge">Квартира</span>
+        </div>
+        <button class="prop-fav-btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg></button>
+    </div>
+    <div class="property-card__content">
+        <div class="prop-price-row">
+            <span class="prop-price">55 000 USD</span>
+            <span class="prop-price-m2">$920/м²</span>
+        </div>
+        <h3 class="property-card__title">2-кімн. квартира у новобудові</h3>
+        <div class="prop-location"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg> вул. Пирогова, 12, Вишенька</div>
+        <div class="prop-specs">
+<span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9h18v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9zm0 0V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v4"></path></svg> 2 кімн.</span><span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 10v9a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-9"></path><path d="M22 10H2"></path><path d="M7 6v4"></path><path d="M17 6v4"></path><path d="M12 2v8"></path></svg> 1</span><span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 3H3v18h18V3z"></path><path d="M21 3l-18 18"></path></svg> 60 м²</span>        </div>
+        <div class="prop-extra">7/16 поверх</div>
+        <button class="btn btn--primary prop-btn-full">Детальніше</button>
+    </div>
+</div>
+<div class="property-card fade-in" data-category="apartment" style="transition-delay: 0.2s;">
+    <div class="property-card__image-wrapper">
+        <img src="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?q=80&w=600&auto=format&fit=crop" alt="Сучасна квартира-студія" class="property-card__image">
+        <div class="prop-badges-top">
+            
+            <span class="prop-type-badge">Квартира</span>
+        </div>
+        <button class="prop-fav-btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg></button>
+    </div>
+    <div class="property-card__content">
+        <div class="prop-price-row">
+            <span class="prop-price">38 000 USD</span>
+            <span class="prop-price-m2">$950/м²</span>
+        </div>
+        <h3 class="property-card__title">Сучасна квартира-студія</h3>
+        <div class="prop-location"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg> вул. Келецька, 89, Замостя</div>
+        <div class="prop-specs">
+<span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9h18v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9zm0 0V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v4"></path></svg> 1 кімн.</span><span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 10v9a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-9"></path><path d="M22 10H2"></path><path d="M7 6v4"></path><path d="M17 6v4"></path><path d="M12 2v8"></path></svg> 1</span><span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 3H3v18h18V3z"></path><path d="M21 3l-18 18"></path></svg> 40 м²</span>        </div>
+        <div class="prop-extra">12/18 поверх</div>
+        <button class="btn btn--primary prop-btn-full">Детальніше</button>
+    </div>
+</div>
+<div class="property-card fade-in" data-category="house" style="transition-delay: 0s;">
+    <div class="property-card__image-wrapper">
+        <img src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?q=80&w=600&auto=format&fit=crop" alt="Двоповерховий котедж з ділянкою" class="property-card__image">
+        <div class="prop-badges-top">
+            <span class="prop-tag" style="background-color: var(--clr-primary);">Нове</span>
+            <span class="prop-type-badge">Будинок</span>
+        </div>
+        <button class="prop-fav-btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg></button>
+    </div>
+    <div class="property-card__content">
+        <div class="prop-price-row">
+            <span class="prop-price">150 000 USD</span>
+            <span class="prop-price-m2"></span>
+        </div>
+        <h3 class="property-card__title">Двоповерховий котедж з ділянкою</h3>
+        <div class="prop-location"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg> с. Якушинці, Передмістя</div>
+        <div class="prop-specs">
+<span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9h18v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9zm0 0V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v4"></path></svg> 5 кімн.</span><span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 10v9a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-9"></path><path d="M22 10H2"></path><path d="M7 6v4"></path><path d="M17 6v4"></path><path d="M12 2v8"></path></svg> 2</span><span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 3H3v18h18V3z"></path><path d="M21 3l-18 18"></path></svg> 180 м²</span>        </div>
+        <div class="prop-extra"></div>
+        <button class="btn btn--primary prop-btn-full">Детальніше</button>
+    </div>
+</div>
+<div class="property-card fade-in" data-category="house" style="transition-delay: 0.1s;">
+    <div class="property-card__image-wrapper">
+        <img src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?q=80&w=600&auto=format&fit=crop" alt="Затишний будинок з садом" class="property-card__image">
+        <div class="prop-badges-top">
+            
+            <span class="prop-type-badge">Будинок</span>
+        </div>
+        <button class="prop-fav-btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg></button>
+    </div>
+    <div class="property-card__content">
+        <div class="prop-price-row">
+            <span class="prop-price">95 000 USD</span>
+            <span class="prop-price-m2"></span>
+        </div>
+        <h3 class="property-card__title">Затишний будинок з садом</h3>
+        <div class="prop-location"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg> с. Агрономічне, Передмістя</div>
+        <div class="prop-specs">
+<span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9h18v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9zm0 0V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v4"></path></svg> 4 кімн.</span><span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 10v9a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-9"></path><path d="M22 10H2"></path><path d="M7 6v4"></path><path d="M17 6v4"></path><path d="M12 2v8"></path></svg> 1</span><span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 3H3v18h18V3z"></path><path d="M21 3l-18 18"></path></svg> 120 м²</span>        </div>
+        <div class="prop-extra"></div>
+        <button class="btn btn--primary prop-btn-full">Детальніше</button>
+    </div>
+</div>
+<div class="property-card fade-in" data-category="land" style="transition-delay: 0.2s;">
+    <div class="property-card__image-wrapper">
+        <img src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=600&auto=format&fit=crop" alt="Ділянка під забудову 15 соток" class="property-card__image">
+        <div class="prop-badges-top">
+            <span class="prop-tag" style="background-color: #8b3e3e;">Гаряча пропозиція</span>
+            <span class="prop-type-badge">Ділянка</span>
+        </div>
+        <button class="prop-fav-btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg></button>
+    </div>
+    <div class="property-card__content">
+        <div class="prop-price-row">
+            <span class="prop-price">25 000 USD</span>
+            <span class="prop-price-m2"></span>
+        </div>
+        <h3 class="property-card__title">Ділянка під забудову 15 соток</h3>
+        <div class="prop-location"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg> с. Лука-Мелешківська, Вінницький район</div>
+        <div class="prop-specs">
+<span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 3H3v18h18V3z"></path><path d="M21 3l-18 18"></path></svg> 1500 м²</span>        </div>
+        <div class="prop-extra"></div>
+        <button class="btn btn--primary prop-btn-full">Детальніше</button>
+    </div>
+</div>
+<div class="property-card fade-in" data-category="apartment" style="transition-delay: 0s;">
+    <div class="property-card__image-wrapper">
+        <img src="https://images.unsplash.com/photo-1493809842364-78817add7ffb?q=80&w=600&auto=format&fit=crop" alt="1-кімн. квартира біля парку" class="property-card__image">
+        <div class="prop-badges-top">
+            
+            <span class="prop-type-badge">Квартира</span>
+        </div>
+        <button class="prop-fav-btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg></button>
+    </div>
+    <div class="property-card__content">
+        <div class="prop-price-row">
+            <span class="prop-price">42 000 USD</span>
+            <span class="prop-price-m2">$1050/м²</span>
+        </div>
+        <h3 class="property-card__title">1-кімн. квартира біля парку</h3>
+        <div class="prop-location"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg> вул. Стрілецька, 23, Центр</div>
+        <div class="prop-specs">
+<span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9h18v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9zm0 0V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v4"></path></svg> 1 кімн.</span><span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 10v9a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-9"></path><path d="M22 10H2"></path><path d="M7 6v4"></path><path d="M17 6v4"></path><path d="M12 2v8"></path></svg> 1</span><span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 3H3v18h18V3z"></path><path d="M21 3l-18 18"></path></svg> 40 м²</span>        </div>
+        <div class="prop-extra">3/5 поверх</div>
+        <button class="btn btn--primary prop-btn-full">Детальніше</button>
+    </div>
+</div>
+<div class="property-card fade-in" data-category="land" style="transition-delay: 0.1s;">
+    <div class="property-card__image-wrapper">
+        <img src="https://images.unsplash.com/photo-1444930694458-e298516a2bdf?q=80&w=600&auto=format&fit=crop" alt="Ділянка з комунікаціями 10 соток" class="property-card__image">
+        <div class="prop-badges-top">
+            <span class="prop-tag" style="background-color: var(--clr-primary);">Нове</span>
+            <span class="prop-type-badge">Ділянка</span>
+        </div>
+        <button class="prop-fav-btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg></button>
+    </div>
+    <div class="property-card__content">
+        <div class="prop-price-row">
+            <span class="prop-price">35 000 USD</span>
+            <span class="prop-price-m2"></span>
+        </div>
+        <h3 class="property-card__title">Ділянка з комунікаціями 10 соток</h3>
+        <div class="prop-location"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg> с. Стрижавка, Вінницький район</div>
+        <div class="prop-specs">
+<span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 3H3v18h18V3z"></path><path d="M21 3l-18 18"></path></svg> 1000 м²</span>        </div>
+        <div class="prop-extra"></div>
+        <button class="btn btn--primary prop-btn-full">Детальніше</button>
+    </div>
+</div>
+<div class="property-card fade-in" data-category="apartment" style="transition-delay: 0.2s;">
+    <div class="property-card__image-wrapper">
+        <img src="https://images.unsplash.com/photo-1556910103-1c02745aae4d?q=80&w=600&auto=format&fit=crop" alt="4-кімн. квартира з терасою" class="property-card__image">
+        <div class="prop-badges-top">
+            
+            <span class="prop-type-badge">Квартира</span>
+        </div>
+        <button class="prop-fav-btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg></button>
+    </div>
+    <div class="property-card__content">
+        <div class="prop-price-row">
+            <span class="prop-price">120 000 USD</span>
+            <span class="prop-price-m2">$1200/м²</span>
+        </div>
+        <h3 class="property-card__title">4-кімн. квартира з терасою</h3>
+        <div class="prop-location"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg> вул. Грушевського, 5, Центр</div>
+        <div class="prop-specs">
+<span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9h18v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9zm0 0V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v4"></path></svg> 4 кімн.</span><span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 10v9a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-9"></path><path d="M22 10H2"></path><path d="M7 6v4"></path><path d="M17 6v4"></path><path d="M12 2v8"></path></svg> 2</span><span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 3H3v18h18V3z"></path><path d="M21 3l-18 18"></path></svg> 100 м²</span>        </div>
+        <div class="prop-extra">8/10 поверх</div>
+        <button class="btn btn--primary prop-btn-full">Детальніше</button>
+    </div>
+</div>
+        </div>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer id="footer" class="footer">
+    <div class="container footer__inner">
+        <div class="footer__col">
+            <a href="index.html" class="logo logo--light">
+                <img src="./logo.png" alt="Рудий Кіт Логотип" style="filter: brightness(0) invert(1);">
+                <span>Рудий Кіт</span>
+            </a>
+            <p class="footer__bio">Ваш надійний партнер у світі нерухомості. Ми робимо процес купівлі, продажу та оренди безпечним і комфортним.</p>
+        </div>
+        
+        <div class="footer__col">
+            <h4 class="footer__title">Швидкі посилання</h4>
+            <ul class="footer__links">
+                <li><a href="#hero">Головна</a></li>
+                <li><a href="#properties">Об'єкти</a></li>
+                <li><a href="#team">Команда</a></li>
+            </ul>
+        </div>
+        
+        <div class="footer__col">
+            <h4 class="footer__title">Контакти</h4>
+            <ul class="footer__contacts">
+                <li>📞 +38 (068) 899-54-35</li>
+                <li>✉️ info@redcat.ua</li>
+                <li>📍 м. Київ, вул. Хрещатик, 1</li>
+            </ul>
+            <div class="footer__socials">
+                <a href="https://www.facebook.com/rydiy.kit" target="_blank" aria-label="Facebook" style="background: transparent; padding: 0;"><img src="./facebook.png" alt="Facebook" style="width: 24px; height: 24px; object-fit: contain; filter: brightness(0) invert(1);"></a>
+                <a href="https://www.instagram.com/rydiy.kit/" target="_blank" aria-label="Instagram" style="background: transparent; padding: 0;"><img src="./instagram.png" alt="Instagram" style="width: 24px; height: 24px; object-fit: contain; filter: brightness(0) invert(1);"></a>
+                <a href="https://t.me/Naz_ar_hik_18" target="_blank" aria-label="Telegram" style="background: transparent; padding: 0;"><img src="./telegram.png" alt="Telegram" style="width: 24px; height: 24px; object-fit: contain; filter: brightness(0) invert(1);"></a>
+            </div>
+        </div>
+    </div>
+    <div class="footer__bottom">
+        <div class="container">
+            <p>&copy; 2026 Агенція нерухомості «Рудий Кіт». Всі права захищені.</p>
+        </div>
+    </div>
+</footer>
+
+<script src="main.js"></script>
+</body>
+</html>
