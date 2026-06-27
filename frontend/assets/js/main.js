@@ -44,7 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 3. Property Filtering
     const filterBtns = document.querySelectorAll('.filter-btn');
-    const propertyCards = document.querySelectorAll('.property-card');
+    let propertyCards = Array.from(document.querySelectorAll('.property-card'));
     const catalogGrid = document.querySelector('.properties__grid');
     
     // Add an element for "Дивіться поблизу" message if on catalog page
@@ -72,7 +72,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function applyFilters(category, query, fallback = false) {
-        if (!propertyCards.length) return;
+        if (!propertyCards || !propertyCards.length) return;
         
         let visibleCount = 0;
         const selectedDistrict = districtFilterSelect ? districtFilterSelect.value : 'all';
