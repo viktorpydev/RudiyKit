@@ -54,11 +54,12 @@ async function fetchAndRenderProperties() {
         if (error) throw error;
         
         if (properties && properties.length > 0) {
-            grid.innerHTML = ''; // Clear static content
+            let htmlStr = '';
             properties.forEach((prop, index) => {
                 const delay = (index % 6) * 0.1;
-                grid.innerHTML += renderPropertyCard(prop, delay);
+                htmlStr += renderPropertyCard(prop, delay);
             });
+            grid.innerHTML = htmlStr;
             // Trigger filters update
             document.dispatchEvent(new Event('propertiesLoaded'));
         }

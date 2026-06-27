@@ -74,6 +74,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function applyFilters(category, query, fallback = false) {
         if (!propertyCards || !propertyCards.length) return;
         
+        const lowerQuery = query ? query.toLowerCase() : '';
         let visibleCount = 0;
         const selectedDistrict = districtFilterSelect ? districtFilterSelect.value : 'all';
         const selectedPrice = priceFilterSelect ? priceFilterSelect.value : 'all';
