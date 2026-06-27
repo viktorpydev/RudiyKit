@@ -1,0 +1,12 @@
+{
+  "name": "redcat-backend-scripts",
+  "version": "1.0.0",
+  "description": "Scripts for managing Supabase database for RedCat",
+  "main": "populate_supabase.js",
+  "scripts": {
+    "populate": "node populate_supabase.js"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.43.0"
+  }
+}

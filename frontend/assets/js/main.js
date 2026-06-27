@@ -1413,6 +1413,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 submitBtn.innerHTML = originalBtnText;
             }
         });
+        });
     }
+
+    document.addEventListener('propertiesLoaded', () => {
+        propertyCards = Array.from(document.querySelectorAll('.property-card'));
+        if (typeof applyFilters === 'function') {
+            applyFilters('all', ''); // Or trigger it via current state
+        }
+    });
 
 });
