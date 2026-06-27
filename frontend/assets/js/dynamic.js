@@ -8,7 +8,7 @@ function renderPropertyCard(prop, delay) {
     if (prop.specs && Array.isArray(prop.specs)) {
         specsHtml = prop.specs.map(spec => `<span>${spec.icon} ${spec.text}</span>`).join('');
     }
-    const tagHtml = prop.tag ? `<span class="prop-tag" style="background-color: ${prop.tagColor || 'var(--clr-primary)'};">${prop.tag}</span>` : '';
+    const tagHtml = prop.tag ? `<span class="prop-tag" style="background-color: ${prop.tagcolor || 'var(--clr-primary)'};">${prop.tag}</span>` : '';
     
     // We get priceperm2 from db
     const m2PriceHtml = prop.priceperm2 ? `<span class="prop-price-m2">${prop.priceperm2}</span>` : '';
@@ -19,7 +19,7 @@ function renderPropertyCard(prop, delay) {
             <img src="${prop.image}" alt="${prop.title}" class="property-card__image">
             <div class="prop-badges-top">
                 ${tagHtml}
-                <span class="prop-type-badge">${prop.typeBadge}</span>
+                <span class="prop-type-badge">${prop.typebadge}</span>
             </div>
             <button class="prop-fav-btn">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
