@@ -60,31 +60,84 @@ document.addEventListener('DOMContentLoaded', () => {
         catalogGrid.parentNode.insertBefore(nearbyMsg, catalogGrid);
     }
 
+    const districtFilterSelect = document.getElementById('districtFilter');
+    const priceFilterSelect = document.getElementById('priceFilter');
+    const sortSelect = document.getElementById('sortSelect');
+
+    function getPrice(card) {
+        const priceEl = card.querySelector('.prop-price');
+        if (!priceEl) return 0;
+        const priceText = priceEl.innerText;
+        return parseInt(priceText.replace(/\D/g, ''), 10) || 0;
+    }
+
     function applyFilters(category, query, fallback = false) {
         if (!propertyCards.length) return;
         
         let visibleCount = 0;
-        const lowerQuery = query ? query.toLowerCase() : '';
+        const selectedDistrict = districtFilterSelect ? districtFilterSelect.value : 'all';
+        const selectedPrice = priceFilterSelect ? priceFilterSelect.value : 'all';
         
+        // Sorting
+        if (sortSelect && !fallback) {
+            const sortVal = sortSelect.value;
+            propertyCards.sort((a, b) => {
+                if (sortVal === 'newest') {
+                    const aIsNew = a.querySelector('.prop-tag') && a.querySelector('.prop-tag').innerText.includes('Нове');
+                    const bIsNew = b.querySelector('.prop-tag') && b.querySelector('.prop-tag').innerText.includes('Нове');
+                    if (aIsNew && !bIsNew) return -1;
+                    if (!aIsNew && bIsNew) return 1;
+                    return 0;
+                } else if (sortVal === 'price-asc') {
+                    return getPrice(a) - getPrice(b);
+                } else if (sortVal === 'price-desc') {
+                    return getPrice(b) - getPrice(a);
+                }
+                return 0;
+            });
+            propertyCards.forEach(card => catalogGrid.appendChild(card));
+        }
+
         propertyCards.forEach(card => {
             const cardCat = card.getAttribute('data-category');
             const cardTitle = card.querySelector('.property-card__title').innerText.toLowerCase();
             const cardLoc = card.querySelector('.prop-location').innerText.toLowerCase();
+            const price = getPrice(card);
             
             // Check category match
             let catMatch = (category === 'all' || cardCat === category);
+
+            // Check district match
+            let districtMatch = true;
+            if (selectedDistrict !== 'all') {
+                districtMatch = cardLoc.includes(selectedDistrict);
+            }
+
+            // Check price match
+            let priceMatch = true;
+            if (selectedPrice !== 'all') {
+                const [min, max] = selectedPrice.split('-').map(Number);
+                priceMatch = price >= min && price <= max;
+            }
             
             // Check query match (in normal mode)
             let queryMatch = true;
             if (!fallback && lowerQuery) {
-                queryMatch = cardTitle.includes(lowerQuery) || cardLoc.includes(lowerQuery);
+                const genericWords = ['вулиця', 'вул.', 'вул', 'проспект', 'просп.', 'просп', 'провулок', 'пров.', 'пров'];
+                const queryWords = lowerQuery.split(/\s+/).filter(w => !genericWords.includes(w) && w.length > 1);
+                
+                if (queryWords.length > 0) {
+                    queryMatch = queryWords.every(word => cardTitle.includes(word) || cardLoc.includes(word));
+                } else {
+                    queryMatch = cardTitle.includes(lowerQuery) || cardLoc.includes(lowerQuery);
+                }
             }
             
             // Clear any pending timeouts on this card to prevent race conditions
             if (card.hideTimeoutId) clearTimeout(card.hideTimeoutId);
             if (card.showTimeoutId) clearTimeout(card.showTimeoutId);
 
-            if (catMatch && queryMatch) {
+            if (catMatch && queryMatch && districtMatch && priceMatch) {
                 card.style.display = 'flex';
                 card.showTimeoutId = setTimeout(() => {
                     card.style.opacity = '1';
@@ -122,6 +175,35 @@ document.addEventListener('DOMContentLoaded', () => {
             applyFilters(filterValue, currentQuery);
         });
     });
+
+    const triggerFiltersUpdate = () => {
+        const currentCat = document.querySelector('.filter-btn.active') ? document.querySelector('.filter-btn.active').getAttribute('data-filter') : 'all';
+        const currentQuery = document.getElementById('search-input') ? document.getElementById('search-input').value.trim() : '';
+        applyFilters(currentCat, currentQuery);
+    };
+
+    if (districtFilterSelect) districtFilterSelect.addEventListener('change', triggerFiltersUpdate);
+    if (priceFilterSelect) priceFilterSelect.addEventListener('change', triggerFiltersUpdate);
+    if (sortSelect) sortSelect.addEventListener('change', triggerFiltersUpdate);
+
+    const toggleAdvancedFiltersBtn = document.getElementById('toggleAdvancedFilters');
+    const advancedFiltersPanel = document.getElementById('advancedFiltersPanel');
+    if (toggleAdvancedFiltersBtn && advancedFiltersPanel) {
+        toggleAdvancedFiltersBtn.addEventListener('click', () => {
+            advancedFiltersPanel.classList.toggle('show');
+            if (advancedFiltersPanel.classList.contains('show')) {
+                toggleAdvancedFiltersBtn.classList.add('active');
+                toggleAdvancedFiltersBtn.style.backgroundColor = 'var(--clr-primary)';
+                toggleAdvancedFiltersBtn.style.color = 'var(--clr-white)';
+                toggleAdvancedFiltersBtn.style.borderColor = 'var(--clr-primary)';
+            } else {
+                toggleAdvancedFiltersBtn.classList.remove('active');
+                toggleAdvancedFiltersBtn.style.backgroundColor = '';
+                toggleAdvancedFiltersBtn.style.color = 'var(--clr-text)';
+                toggleAdvancedFiltersBtn.style.borderColor = '#eee';
+            }
+        });
+    }
     // 4. Hero Search Tabs Interactivity
     const searchTabs = document.querySelectorAll('.search-tab');
     searchTabs.forEach(tab => {
@@ -1221,6 +1303,22 @@ document.addEventListener('DOMContentLoaded', () => {
     const formStatus = document.getElementById('form-status');
 
     if (contactForm) {
+        const phoneInput = document.getElementById('phone');
+        if (phoneInput) {
+            phoneInput.addEventListener('input', function (e) {
+                let val = e.target.value;
+                
+                // Видаляємо всі недозволені символи (залишаємо цифри, +, пробіл, дефіс, дужки)
+                val = val.replace(/[^\d\+\s\-\(\)]/g, '');
+                
+                // Залишаємо лише один '+' і тільки на початку
+                if (val.includes('+')) {
+                    val = '+' + val.replace(/\+/g, '');
+                }
+                
+                e.target.value = val;
+            });
+        }
         contactForm.addEventListener('submit', async (e) => {
             e.preventDefault();
 

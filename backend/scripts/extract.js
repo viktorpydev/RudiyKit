@@ -1,6 +1,7 @@
 const fs = require('fs');
+const path = require('path');
 
-let indexHtml = fs.readFileSync('index.html', 'utf-8');
+let indexHtml = fs.readFileSync(path.join(__dirname, '../../frontend/index.html'), 'utf-8');
 
 // 1. Extract pieces
 const headerRegex = /<!-- Header -->\s*<header class="header">[\s\S]*?<\/header>/;
@@ -41,7 +42,7 @@ ${propertiesHTML}
 
 ${footerHTML}
 
-<script src="main.js"></script>
+<script src="assets/js/main.js"></script>
 </body>
 </html>`;
 
@@ -50,12 +51,12 @@ catalogHtml = catalogHtml.replace('<a href="#hero" class="nav__link">Голов�
 catalogHtml = catalogHtml.replace('<a href="#properties" class="nav__link">Об\'єкти</a>', '<a href="catalog.html" class="nav__link active">Об\'єкти</a>');
 catalogHtml = catalogHtml.replace('<a href="#team" class="nav__link">Команда</a>', '<a href="index.html#team" class="nav__link">Команда</a>');
 
-fs.writeFileSync('catalog.html', catalogHtml);
+fs.writeFileSync(path.join(__dirname, '../../frontend/catalog.html'), catalogHtml);
 console.log('Created catalog.html');
 
 // 3. Update index.html
 indexHtml = indexHtml.replace(propertiesRegex, ''); // Remove properties
 indexHtml = indexHtml.replace('<a href="#properties" class="nav__link">Об\'єкти</a>', '<a href="catalog.html" class="nav__link">Об\'єкти</a>');
 
-fs.writeFileSync('index.html', indexHtml);
+fs.writeFileSync(path.join(__dirname, '../../frontend/index.html'), indexHtml);
 console.log('Updated index.html');

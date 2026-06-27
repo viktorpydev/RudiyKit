@@ -1,4 +1,5 @@
 const fs = require('fs');
+const path = require('path');
 
 async function scrape() {
     try {
@@ -21,7 +22,7 @@ async function scrape() {
         }
         
         const arr = Array.from(streets);
-        fs.writeFileSync('streets.json', JSON.stringify(arr, null, 2));
+        fs.writeFileSync(path.join(__dirname, '../data/streets.json'), JSON.stringify(arr, null, 2));
         console.log('Found ' + arr.length + ' streets.');
     } catch (e) {
         console.error(e);

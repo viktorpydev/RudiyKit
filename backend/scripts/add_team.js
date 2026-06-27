@@ -1,4 +1,5 @@
 const fs = require('fs');
+const path = require('path');
 
 const team = [
     {
@@ -73,10 +74,10 @@ team.forEach((member, index) => {
                    '</div>\n';
 });
 
-let indexHtml = fs.readFileSync('index.html', 'utf-8');
+let indexHtml = fs.readFileSync(path.join(__dirname, '../../frontend/index.html'), 'utf-8');
 const gridRegex = /<div class="team__grid">[\s\S]*?<\/div>\s*<\/div>\s*<\/section>/;
 const replacement = '<div class="team__grid">\n' + htmlContent + '        </div>\n    </div>\n</section>';
 indexHtml = indexHtml.replace(gridRegex, replacement);
 
-fs.writeFileSync('index.html', indexHtml);
+fs.writeFileSync(path.join(__dirname, '../../frontend/index.html'), indexHtml);
 console.log('Done');

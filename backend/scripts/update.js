@@ -1,6 +1,7 @@
 const fs = require('fs');
+const path = require('path');
 
-const streets = JSON.parse(fs.readFileSync('streets.json', 'utf-8'));
+const streets = JSON.parse(fs.readFileSync(path.join(__dirname, '../data/streets.json'), 'utf-8'));
 
 let locationsData = `const locations = [\n`;
 locationsData += `    { name: "Центр", type: "Район", icon: "map-pin" },\n`;
@@ -31,12 +32,12 @@ for (let street of streets) {
 }
 locationsData = locationsData.slice(0, -2) + `\n    ];`;
 
-let mainJs = fs.readFileSync('main.js', 'utf-8');
+let mainJs = fs.readFileSync(path.join(__dirname, '../../frontend/assets/js/main.js'), 'utf-8');
 
 const regex = /const locations = \[\s*\{ name: "Центр".*?\];/s;
 mainJs = mainJs.replace(regex, locationsData);
 
 mainJs = mainJs.replace('items.forEach(item => {', 'items.slice(0, 15).forEach(item => {');
 
-fs.writeFileSync('main.js', mainJs);
+fs.writeFileSync(path.join(__dirname, '../../frontend/assets/js/main.js'), mainJs);
 console.log('Successfully updated main.js with ' + streets.length + ' streets.');

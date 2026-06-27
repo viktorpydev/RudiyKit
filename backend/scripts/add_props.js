@@ -1,4 +1,5 @@
 const fs = require('fs');
+const path = require('path');
 
 const properties = [
     {
@@ -182,7 +183,7 @@ properties.forEach((prop, index) => {
                    '</div>\n';
 });
 
-let catalogHtml = fs.readFileSync('catalog.html', 'utf-8');
+let catalogHtml = fs.readFileSync(path.join(__dirname, '../../frontend/catalog.html'), 'utf-8');
 const gridRegex = /<div class="properties__grid">[\s\S]*?<\/div>\s*<\/div>\s*<\/section>/;
 const replacement = '<div class="properties__grid">\n' + htmlContent + '        </div>\n    </div>\n</section>';
 catalogHtml = catalogHtml.replace(gridRegex, replacement);
@@ -198,5 +199,5 @@ const newFilters = `<div class="filters fade-in">
         </div>`;
 catalogHtml = catalogHtml.replace(filterRegex, newFilters);
 
-fs.writeFileSync('catalog.html', catalogHtml);
+fs.writeFileSync(path.join(__dirname, '../../frontend/catalog.html'), catalogHtml);
 console.log('Done');

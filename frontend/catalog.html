@@ -5,11 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Каталог об'єктів нерухомості агенції «Рудий Кіт».">
     <title>Об'єкти — Агенція нерухомості «Рудий Кіт»</title>
-    <link rel="icon" type="image/png" href="./logo.png">
+    <link rel="icon" type="image/png" href="assets/images/logo.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body style="padding-top: 80px;">
 
@@ -17,7 +17,7 @@
 <header class="header">
     <div class="container header__inner">
         <a href="index.html" class="logo">
-            <img src="./logo.png" alt="Рудий Кіт Логотип">
+            <img src="assets/images/logo.png" alt="Рудий Кіт Логотип">
             <span>Рудий Кіт</span>
         </a>
         
@@ -61,12 +61,69 @@
 <section id="properties" class="properties section bg-light" style="padding-top: 0;">
     <div class="container">
         
-        <div class="filters fade-in">
-            <button class="filter-btn active" data-filter="all">Всі</button>
-            <button class="filter-btn" data-filter="apartment">Квартири</button>
-            <button class="filter-btn" data-filter="house">Будинки</button>
-            <button class="filter-btn" data-filter="land">Ділянки</button>
-            <button class="filter-btn" data-filter="commercial">Комерція</button>
+        <div class="filters-toolbar fade-in">
+            <div class="filters-categories">
+                <button class="filter-btn active" data-filter="all">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 6px;"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+                    Усі
+                </button>
+                <button class="filter-btn" data-filter="apartment">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 6px;"><path d="M4 22v-17a3 3 0 0 1 3-3h10a3 3 0 0 1 3 3v17"></path><path d="M9 22v-4h6v4"></path><path d="M8 6h.01"></path><path d="M16 6h.01"></path><path d="M12 6h.01"></path><path d="M12 10h.01"></path><path d="M12 14h.01"></path><path d="M16 10h.01"></path><path d="M16 14h.01"></path><path d="M8 10h.01"></path><path d="M8 14h.01"></path></svg>
+                    Квартири
+                </button>
+                <button class="filter-btn" data-filter="house">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 6px;"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                    Будинки
+                </button>
+                <button class="filter-btn" data-filter="land">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 6px;"><path d="M3 18l3-4 4 4 6-8 5 8"></path></svg>
+                    Ділянки
+                </button>
+                <button class="filter-btn" data-filter="commercial">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 6px;"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+                    Комерція
+                </button>
+            </div>
+            <div class="filters-actions">
+                <div class="sort-wrapper">
+                    <select id="sortSelect" class="custom-select">
+                        <option value="newest">Спочатку нові</option>
+                        <option value="price-asc">Від дешевих до дорогих</option>
+                        <option value="price-desc">Від дорогих до дешевих</option>
+                    </select>
+                </div>
+                <button id="toggleAdvancedFilters" class="btn btn--outline" style="display: flex; align-items: center; gap: 8px; border-color: #eee; color: var(--clr-text); border-radius: 8px; padding: 0.5rem 1rem;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
+                    Фільтри
+                </button>
+            </div>
+        </div>
+
+        <div id="advancedFiltersPanel" class="advanced-filters">
+            <div class="filter-group">
+                <label for="districtFilter"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:4px;"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg> Район</label>
+                <div class="custom-select-wrapper">
+                    <select id="districtFilter" class="custom-select">
+                        <option value="all">Усі райони</option>
+                        <option value="центр">Центр</option>
+                        <option value="замостя">Замостя</option>
+                        <option value="вишенька">Вишенька</option>
+                        <option value="словянка">Слов'янка</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="filter-group">
+                <label for="priceFilter">Ціна</label>
+                <div class="custom-select-wrapper">
+                    <select id="priceFilter" class="custom-select">
+                        <option value="all">Будь-яка ціна</option>
+                        <option value="0-50000">До 50 000 USD</option>
+                        <option value="50000-100000">50 000 - 100 000 USD</option>
+                        <option value="100000-9999999">Від 100 000 USD</option>
+                    </select>
+                </div>
+            </div>
         </div>
         
         <div class="properties__grid">
@@ -277,7 +334,7 @@
     <div class="container footer__inner">
         <div class="footer__col">
             <a href="index.html" class="logo logo--light">
-                <img src="./logo.png" alt="Рудий Кіт Логотип" style="filter: brightness(0) invert(1);">
+                <img src="assets/images/logo.png" alt="Рудий Кіт Логотип" style="filter: brightness(0) invert(1);">
                 <span>Рудий Кіт</span>
             </a>
             <p class="footer__bio">Ваш надійний партнер у світі нерухомості. Ми робимо процес купівлі, продажу та оренди безпечним і комфортним.</p>
@@ -300,9 +357,10 @@
                 <li>📍 м. Вінниця, вул. Соборна, 25</li>
             </ul>
             <div class="footer__socials">
-                <a href="https://www.facebook.com/rydiy.kit" target="_blank" aria-label="Facebook" style="background: transparent; padding: 0;"><img src="./facebook.png" alt="Facebook" style="width: 24px; height: 24px; object-fit: contain; filter: brightness(0) invert(1);"></a>
-                <a href="https://www.instagram.com/rydiy.kit/" target="_blank" aria-label="Instagram" style="background: transparent; padding: 0;"><img src="./instagram.png" alt="Instagram" style="width: 24px; height: 24px; object-fit: contain; filter: brightness(0) invert(1);"></a>
-                <a href="https://t.me/Naz_ar_hik_18" target="_blank" aria-label="Telegram" style="background: transparent; padding: 0;"><img src="./telegram.png" alt="Telegram" style="width: 24px; height: 24px; object-fit: contain; filter: brightness(0) invert(1);"></a>
+                <a href="https://www.facebook.com/rydiy.kit" target="_blank" aria-label="Facebook" style="background: transparent; padding: 0;"><img src="assets/images/facebook.png" alt="Facebook" style="width: 24px; height: 24px; object-fit: contain; filter: brightness(0) invert(1);"></a>
+                <a href="https://www.instagram.com/rydiy.kit/" target="_blank" aria-label="Instagram" style="background: transparent; padding: 0;"><img src="assets/images/instagram.png" alt="Instagram" style="width: 24px; height: 24px; object-fit: contain; filter: brightness(0) invert(1);"></a>
+                <a href="https://t.me/Naz_ar_hik_18" target="_blank" aria-label="Telegram" style="background: transparent; padding: 0;"><img src="assets/images/telegram.png" alt="Telegram" style="width: 24px; height: 24px; object-fit: contain; filter: brightness(0) invert(1);"></a>
+                <a href="https://dom.ria.com/uk/agency-26983.html" target="_blank" aria-label="DOM.RIA" style="background: transparent; padding: 0;"><img src="assets/images/ДімРіа.png" alt="DOM.RIA" style="width: 24px; height: 24px; object-fit: contain; filter: brightness(0) invert(1);"></a>
             </div>
         </div>
     </div>
@@ -313,6 +371,6 @@
     </div>
 </footer>
 
-<script src="main.js"></script>
+<script src="assets/js/main.js"></script>
 </body>
 </html>

@@ -1,4 +1,5 @@
 const fs = require('fs');
+const path = require('path');
 
 const statsHtml = `
 <!-- Stats Section -->
@@ -59,7 +60,7 @@ const statsHtml = `
                 
                 <div class="form-group">
                     <label for="phone">Номер телефону</label>
-                    <input type="tel" id="phone" placeholder="+38 (0XX) XXX-XX-XX" class="form-input">
+                    <input type="tel" id="phone" placeholder="+38 (0XX) XXX-XX-XX" class="form-input" minlength="9" maxlength="20" pattern="^\\+?[0-9\\s\\-\\(\\)]{9,20}$" required>
                 </div>
                 
                 <div class="form-group">
@@ -135,10 +136,10 @@ const statsHtml = `
 </section>
 `;
 
-let indexHtml = fs.readFileSync('index.html', 'utf-8');
+let indexHtml = fs.readFileSync(path.join(__dirname, '../../frontend/index.html'), 'utf-8');
 const teamEndRegex = /<\/section>\s*<!-- Footer -->/;
 indexHtml = indexHtml.replace(teamEndRegex, '</section>\n' + statsHtml + '\n<!-- Footer -->');
-fs.writeFileSync('index.html', indexHtml);
+fs.writeFileSync(path.join(__dirname, '../../frontend/index.html'), indexHtml);
 
 const cssContent = `
 /* Stats Section */
@@ -353,9 +354,9 @@ const cssContent = `
 }
 `;
 
-fs.appendFileSync('style.css', cssContent);
+fs.appendFileSync(path.join(__dirname, '../../frontend/assets/css/style.css'), cssContent);
 
-let jsContent = fs.readFileSync('main.js', 'utf-8');
+let jsContent = fs.readFileSync(path.join(__dirname, '../../frontend/assets/js/main.js'), 'utf-8');
 const jsCode = `
     // 9. Contact Form Radio Buttons
     const formRadios = document.querySelectorAll('.form-radio');
@@ -370,7 +371,7 @@ const jsCode = `
 
 if (!jsContent.includes('// 9. Contact Form Radio Buttons')) {
     jsContent = jsContent.replace(/}\);\s*$/, jsCode + '\n});');
-    fs.writeFileSync('main.js', jsContent);
+    fs.writeFileSync(path.join(__dirname, '../../frontend/assets/js/main.js'), jsContent);
 }
 
 console.log('Sections added');
