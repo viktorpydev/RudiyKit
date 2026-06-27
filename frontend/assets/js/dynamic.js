@@ -1,7 +1,7 @@
 // Supabase Setup
 const supabaseUrl = 'https://qwunxhnjacfgvtsoflca.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF3dW54aG5qYWNmZ3Z0c29mbGNhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI0NTY0NjQsImV4cCI6MjA5ODAzMjQ2NH0.jGFZyCTnmkUzuqxpBcKSqDKq-oxDnfoK0npHBYQvTOM';
-const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
 
 function renderPropertyCard(prop, delay) {
     let specsHtml = '';
@@ -46,7 +46,7 @@ async function fetchAndRenderProperties() {
     if (!grid) return;
 
     try {
-        const { data: properties, error } = await supabase
+        const { data: properties, error } = await supabaseClient
             .from('properties')
             .select('*')
             .order('created_at', { ascending: false });

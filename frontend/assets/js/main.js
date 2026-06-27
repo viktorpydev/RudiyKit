@@ -1413,7 +1413,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 submitBtn.innerHTML = originalBtnText;
             }
         });
-        });
     }
 
     document.addEventListener('propertiesLoaded', () => {
