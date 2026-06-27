@@ -85,12 +85,35 @@
                 </button>
             </div>
             <div class="filters-actions">
-                <div class="sort-wrapper">
-                    <select id="sortSelect" class="custom-select">
-                        <option value="newest">Спочатку нові</option>
-                        <option value="price-asc">Від дешевих до дорогих</option>
-                        <option value="price-desc">Від дорогих до дешевих</option>
-                    </select>
+                <div class="custom-dropdown sort-dropdown">
+                    <input type="hidden" id="sortSelect" value="newest">
+                    <div class="custom-dropdown__trigger">
+                        <span class="custom-dropdown__trigger-text">Спочатку нові</span>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="custom-dropdown__arrow"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </div>
+                    <div class="custom-dropdown__menu">
+                        <div class="custom-dropdown__option selected" data-value="newest">
+                            <svg class="option-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f26a36" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                            <div class="option-text">
+                                <div class="option-title">Спочатку нові</div>
+                                <div class="option-subtitle">Сортування</div>
+                            </div>
+                        </div>
+                        <div class="custom-dropdown__option" data-value="price-asc">
+                            <svg class="option-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#777" stroke-width="2"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg>
+                            <div class="option-text">
+                                <div class="option-title">Від дешевих до дорогих</div>
+                                <div class="option-subtitle">Сортування</div>
+                            </div>
+                        </div>
+                        <div class="custom-dropdown__option" data-value="price-desc">
+                            <svg class="option-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#777" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><polyline points="19 12 12 19 5 12"></polyline></svg>
+                            <div class="option-text">
+                                <div class="option-title">Від дорогих до дешевих</div>
+                                <div class="option-subtitle">Сортування</div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <button id="toggleAdvancedFilters" class="btn btn--outline" style="display: flex; align-items: center; gap: 8px; border-color: #eee; color: var(--clr-text); border-radius: 8px; padding: 0.5rem 1rem;">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
@@ -102,26 +125,90 @@
         <div id="advancedFiltersPanel" class="advanced-filters">
             <div class="filter-group">
                 <label for="districtFilter"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:4px;"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg> Район</label>
-                <div class="custom-select-wrapper">
-                    <select id="districtFilter" class="custom-select">
-                        <option value="all">Усі райони</option>
-                        <option value="центр">Центр</option>
-                        <option value="замостя">Замостя</option>
-                        <option value="вишенька">Вишенька</option>
-                        <option value="словянка">Слов'янка</option>
-                    </select>
+                <div class="custom-dropdown filter-dropdown">
+                    <input type="hidden" id="districtFilter" value="all">
+                    <div class="custom-dropdown__trigger">
+                        <span class="custom-dropdown__trigger-text">Усі райони</span>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="custom-dropdown__arrow"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </div>
+                    <div class="custom-dropdown__menu">
+                        <div class="custom-dropdown__option selected" data-value="all">
+                            <svg class="option-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f26a36" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                            <div class="option-text">
+                                <div class="option-title">Усі райони</div>
+                                <div class="option-subtitle">Район міста</div>
+                            </div>
+                        </div>
+                        <div class="custom-dropdown__option" data-value="центр">
+                            <svg class="option-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#777" stroke-width="2"><path d="M22 2L11 13"></path><path d="M22 2L15 22L11 13L2 9L22 2"></path></svg>
+                            <div class="option-text">
+                                <div class="option-title">Центр</div>
+                                <div class="option-subtitle">Район міста</div>
+                            </div>
+                        </div>
+                        <div class="custom-dropdown__option" data-value="замостя">
+                            <svg class="option-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#777" stroke-width="2"><path d="M22 2L11 13"></path><path d="M22 2L15 22L11 13L2 9L22 2"></path></svg>
+                            <div class="option-text">
+                                <div class="option-title">Замостя</div>
+                                <div class="option-subtitle">Район міста</div>
+                            </div>
+                        </div>
+                        <div class="custom-dropdown__option" data-value="вишенька">
+                            <svg class="option-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#777" stroke-width="2"><path d="M22 2L11 13"></path><path d="M22 2L15 22L11 13L2 9L22 2"></path></svg>
+                            <div class="option-text">
+                                <div class="option-title">Вишенька</div>
+                                <div class="option-subtitle">Район міста</div>
+                            </div>
+                        </div>
+                        <div class="custom-dropdown__option" data-value="словянка">
+                            <svg class="option-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#777" stroke-width="2"><path d="M22 2L11 13"></path><path d="M22 2L15 22L11 13L2 9L22 2"></path></svg>
+                            <div class="option-text">
+                                <div class="option-title">Слов'янка</div>
+                                <div class="option-subtitle">Район міста</div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
             
             <div class="filter-group">
                 <label for="priceFilter">Ціна</label>
-                <div class="custom-select-wrapper">
-                    <select id="priceFilter" class="custom-select">
-                        <option value="all">Будь-яка ціна</option>
-                        <option value="0-50000">До 50 000 USD</option>
-                        <option value="50000-100000">50 000 - 100 000 USD</option>
-                        <option value="100000-9999999">Від 100 000 USD</option>
-                    </select>
+                <div class="custom-dropdown filter-dropdown">
+                    <input type="hidden" id="priceFilter" value="all">
+                    <div class="custom-dropdown__trigger">
+                        <span class="custom-dropdown__trigger-text">Будь-яка ціна</span>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="custom-dropdown__arrow"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </div>
+                    <div class="custom-dropdown__menu">
+                        <div class="custom-dropdown__option selected" data-value="all">
+                            <svg class="option-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f26a36" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>
+                            <div class="option-text">
+                                <div class="option-title">Будь-яка ціна</div>
+                                <div class="option-subtitle">Ціна об'єкта</div>
+                            </div>
+                        </div>
+                        <div class="custom-dropdown__option" data-value="0-50000">
+                            <svg class="option-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#777" stroke-width="2"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg>
+                            <div class="option-text">
+                                <div class="option-title">До 50 000 USD</div>
+                                <div class="option-subtitle">Ціна об'єкта</div>
+                            </div>
+                        </div>
+                        <div class="custom-dropdown__option" data-value="50000-100000">
+                            <svg class="option-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#777" stroke-width="2"><line x1="4" y1="12" x2="20" y2="12"></line><line x1="4" y1="6" x2="20" y2="6"></line><line x1="4" y1="18" x2="20" y2="18"></line></svg>
+                            <div class="option-text">
+                                <div class="option-title">50 000 - 100 000 USD</div>
+                                <div class="option-subtitle">Ціна об'єкта</div>
+                            </div>
+                        </div>
+                        <div class="custom-dropdown__option" data-value="100000-9999999">
+                            <svg class="option-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#777" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><polyline points="19 12 12 19 5 12"></polyline></svg>
+                            <div class="option-text">
+                                <div class="option-title">Від 100 000 USD</div>
+                                <div class="option-subtitle">Ціна об'єкта</div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

@@ -182,9 +182,38 @@ document.addEventListener('DOMContentLoaded', () => {
         applyFilters(currentCat, currentQuery);
     };
 
-    if (districtFilterSelect) districtFilterSelect.addEventListener('change', triggerFiltersUpdate);
-    if (priceFilterSelect) priceFilterSelect.addEventListener('change', triggerFiltersUpdate);
-    if (sortSelect) sortSelect.addEventListener('change', triggerFiltersUpdate);
+    // Custom Dropdown Logic
+    const customDropdowns = document.querySelectorAll('.custom-dropdown');
+    customDropdowns.forEach(dropdown => {
+        const trigger = dropdown.querySelector('.custom-dropdown__trigger');
+        const triggerText = dropdown.querySelector('.custom-dropdown__trigger-text');
+        const options = dropdown.querySelectorAll('.custom-dropdown__option');
+        const hiddenInput = dropdown.querySelector('input[type="hidden"]');
+        
+        trigger.addEventListener('click', (e) => {
+            e.stopPropagation();
+            customDropdowns.forEach(d => {
+                if(d !== dropdown) d.classList.remove('open');
+            });
+            dropdown.classList.toggle('open');
+        });
+        
+        options.forEach(option => {
+            option.addEventListener('click', (e) => {
+                e.stopPropagation();
+                options.forEach(opt => opt.classList.remove('selected'));
+                option.classList.add('selected');
+                triggerText.innerText = option.querySelector('.option-title').innerText;
+                hiddenInput.value = option.getAttribute('data-value');
+                dropdown.classList.remove('open');
+                triggerFiltersUpdate();
+            });
+        });
+    });
+
+    document.addEventListener('click', () => {
+        customDropdowns.forEach(dropdown => dropdown.classList.remove('open'));
+    });
 
     const toggleAdvancedFiltersBtn = document.getElementById('toggleAdvancedFilters');
     const advancedFiltersPanel = document.getElementById('advancedFiltersPanel');
