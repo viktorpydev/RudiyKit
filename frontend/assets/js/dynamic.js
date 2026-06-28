@@ -6,7 +6,10 @@ const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
 function renderPropertyCard(prop, delay) {
     let specsHtml = '';
     if (prop.specs && Array.isArray(prop.specs)) {
-        specsHtml = prop.specs.map(spec => `<span>${spec.icon} ${spec.text}</span>`).join('');
+        specsHtml = prop.specs
+            .filter(spec => spec.text && spec.text.trim().toLowerCase() !== 'не вказано')
+            .map(spec => `<span>${spec.icon} ${spec.text}</span>`)
+            .join('');
     }
     const tagHtml = prop.tag ? `<span class="prop-tag" style="background-color: ${prop.tagcolor || 'var(--clr-primary)'};">${prop.tag}</span>` : '';
     
@@ -31,7 +34,7 @@ function renderPropertyCard(prop, delay) {
                 <span class="prop-price">${prop.price}</span>
                 ${m2PriceHtml}
             </div>
-            <div class="prop-location"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg> ${prop.location}</div>
+            ${(prop.location && prop.location.trim() !== 'Невідома адреса') ? `<div class="prop-location"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg> ${prop.location}</div>` : ''}
             <div class="prop-specs">
                 ${specsHtml}
             </div>
