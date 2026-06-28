@@ -16,6 +16,11 @@ function renderPropertyCard(prop, delay) {
     // We get priceperm2 from db
     const m2PriceHtml = prop.priceperm2 ? `<span class="prop-price-m2"> &bull; ${prop.priceperm2}</span>` : '';
 
+    let displayPrice = prop.price || '';
+    if (prop.category === 'rent' && displayPrice && !displayPrice.toLowerCase().includes('/міс')) {
+        displayPrice += ' / міс.';
+    }
+
     return `
     <div class="property-card fade-in" style="transition-delay: ${delay}s;" data-category="${prop.category}">
         <div class="property-card__image-wrapper">
@@ -31,7 +36,7 @@ function renderPropertyCard(prop, delay) {
         <div class="property-card__content">
             <h3 class="property-card__title">${prop.title}</h3>
             <div class="prop-price-row">
-                <span class="prop-price">${prop.price}</span>
+                <span class="prop-price">${displayPrice}</span>
                 ${m2PriceHtml}
             </div>
             ${(prop.location && prop.location.trim() !== 'Невідома адреса') ? `<div class="prop-location"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg> ${prop.location}</div>` : ''}
