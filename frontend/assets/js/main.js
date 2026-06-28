@@ -102,7 +102,8 @@ document.addEventListener('DOMContentLoaded', () => {
         propertyCards.forEach(card => {
             const cardCat = card.getAttribute('data-category');
             const cardTitle = card.querySelector('.property-card__title').innerText.toLowerCase();
-            const cardLoc = card.querySelector('.prop-location').innerText.toLowerCase();
+            const locEl = card.querySelector('.prop-location');
+            const cardLoc = locEl ? locEl.innerText.toLowerCase() : '';
             const price = getPrice(card);
             
             // Check category match
