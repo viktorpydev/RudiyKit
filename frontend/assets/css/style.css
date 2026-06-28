@@ -823,6 +823,12 @@ img {
     font-size: 1.1rem;
     margin-bottom: 0.5rem;
     line-height: 1.4;
+    min-height: 4.62rem; /* 3 lines of text */
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .prop-price-row {
