@@ -11,7 +11,7 @@ function renderPropertyCard(prop, delay) {
     const tagHtml = prop.tag ? `<span class="prop-tag" style="background-color: ${prop.tagcolor || 'var(--clr-primary)'};">${prop.tag}</span>` : '';
     
     // We get priceperm2 from db
-    const m2PriceHtml = prop.priceperm2 ? `<span class="prop-price-m2">${prop.priceperm2}</span>` : '';
+    const m2PriceHtml = prop.priceperm2 ? `<span class="prop-price-m2"> &bull; ${prop.priceperm2}</span>` : '';
 
     return `
     <div class="property-card fade-in" style="transition-delay: ${delay}s;" data-category="${prop.category}">

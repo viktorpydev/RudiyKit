@@ -820,8 +820,24 @@ img {
 
 .property-card__title {
     font-size: 1.1rem;
-    margin-bottom: 1rem;
+    margin-bottom: 0.5rem;
     line-height: 1.4;
+}
+
+.prop-price-row {
+    margin-bottom: 1rem;
+}
+
+.prop-price {
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: var(--clr-primary);
+}
+
+.prop-price-m2 {
+    font-weight: 400;
+    font-size: 0.85rem;
+    color: var(--clr-text-light);
 }
 
 .property-card__specs {
