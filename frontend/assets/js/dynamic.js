@@ -139,27 +139,110 @@ window.openPropertyModal = function(id) {
     }
 
     document.getElementById('modalImage').src = prop.image || '';
+    
+    const modalBadges = document.getElementById('modalBadges');
+    if (modalBadges) {
+        let badgesHtml = '';
+        if (prop.tag) {
+            badgesHtml += `<span class="prop-tag" style="background-color: ${prop.tagcolor || 'var(--clr-primary)'};">${prop.tag}</span>`;
+        }
+        if (prop.typebadge) {
+            badgesHtml += `<span class="prop-type-badge">${prop.typebadge}</span>`;
+        }
+        modalBadges.innerHTML = badgesHtml;
+    }
+
     document.getElementById('modalTitle').textContent = prop.title || '';
     
-    // Price with dynamic UAH conversion
-    let priceText = prop.price || '';
-    if (window.usdRate && priceText.includes('$')) {
-        const usdValue = parseInt(priceText.replace(/\D/g, ''), 10);
+    // Price Parsing
+    let rawPrice = prop.price || '';
+    // Format: "99 000 $ за об'єкт · 4 059 000 грн · 1 028 $ за м²"
+    let usdMain = '';
+    let sqMeter = '';
+    
+    // Extract main USD price
+    const usdMatch = rawPrice.match(/([\d\s]+)\s*\$/);
+    if (usdMatch) {
+        usdMain = `${usdMatch[1].trim()} $`;
+    } else {
+        usdMain = rawPrice.split('·')[0].replace(/за об\'єкт/g, '').trim();
+    }
+
+    // Extract per sq meter if exists
+    const sqMatch = rawPrice.match(/([\d\s]+\$)\s*за м²/);
+    if (sqMatch) {
+        sqMeter = `${sqMatch[1].trim()} за м²`;
+    }
+
+    let priceHtml = `<div>${usdMain}</div>`;
+    
+    // Calculate UAH using live rate
+    let subPrices = [];
+    if (window.usdRate && usdMain) {
+        const usdValue = parseInt(usdMain.replace(/\D/g, ''), 10);
         if (!isNaN(usdValue)) {
             const uahValue = Math.round(usdValue * window.usdRate);
-            priceText = `${priceText} &bull; ${uahValue.toLocaleString('uk-UA')} грн`;
+            subPrices.push(`${uahValue.toLocaleString('uk-UA')} грн`);
         }
     }
-    document.getElementById('modalPrice').innerHTML = priceText;
+    if (sqMeter) subPrices.push(sqMeter);
+    
+    if (subPrices.length > 0) {
+        priceHtml += `<div class="property-modal__price-sub">${subPrices.join(' &bull; ')}</div>`;
+    }
+    document.getElementById('modalPrice').innerHTML = priceHtml;
     
     document.getElementById('modalAddress').textContent = prop.location || 'Невідома адреса';
     
-    // Description: show loading if empty, though we will fetch it soon
-    const descEl = document.getElementById('modalDesc');
-    let desc = prop.description || '';
-    descEl.innerHTML = (desc.trim() !== '') 
-        ? desc.replace(/\n/g, '<br>').replace(/\\n/g, '<br>') 
-        : 'Детальний опис ще не завантажено...';
+    // Handle Specs
+    const modalSpecs = document.getElementById('modalSpecs');
+    if (modalSpecs) {
+        if (prop.specs && Array.isArray(prop.specs) && prop.specs.length > 0) {
+            const filteredSpecs = prop.specs.filter(spec => spec.text && spec.text.trim().toLowerCase() !== 'не вказано');
+            if (filteredSpecs.length > 0) {
+                modalSpecs.innerHTML = filteredSpecs.map(spec => `
+                    <div class="property-modal__spec-item">
+                        ${spec.icon}
+                        <span>${spec.text}</span>
+                    </div>
+                `).join('');
+                modalSpecs.style.display = 'grid';
+            } else {
+                modalSpecs.style.display = 'none';
+            }
+        } else {
+            modalSpecs.style.display = 'none';
+        }
+    }
+    
+    // Handle Extra
+    const modalExtra = document.getElementById('modalExtra');
+    if (modalExtra) {
+        if (prop.extra) {
+            // prop.extra is usually a string with tags or spans.
+            modalExtra.innerHTML = prop.extra;
+            modalExtra.style.display = 'flex';
+        } else {
+            modalExtra.style.display = 'none';
+            modalExtra.innerHTML = '';
+        }
+    }
+    
+    // Handle Map
+    const mapContainer = document.getElementById('modalMapContainer');
+    if (mapContainer && prop.location) {
+        mapContainer.innerHTML = `<iframe src="https://maps.google.com/maps?q=${encodeURIComponent(prop.location + ', Вінниця')}&t=&z=13&ie=UTF8&iwloc=&output=embed" frameborder="0" style="border:0; width:100%; height:250px; border-radius:12px; margin-top:1rem;" allowfullscreen></iframe>`;
+    } else if (mapContainer) {
+        mapContainer.innerHTML = '';
+    }
+    
+    // Description
+    if (prop.description) {
+        // Replace newlines with <br> and support bold tags if scraped
+        document.getElementById('modalDesc').innerHTML = prop.description.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    } else {
+        document.getElementById('modalDesc').innerHTML = 'Детальний опис ще не завантажено...';
+    }
 
     // Button: DOM.RIA
     const domriaBtn = document.getElementById('modalDomriaBtn');
