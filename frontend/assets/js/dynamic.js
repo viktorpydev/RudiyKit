@@ -4,6 +4,19 @@ const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS
 const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
 
 window.propertiesMap = new Map();
+window.usdRate = null;
+
+async function fetchUsdRate() {
+    try {
+        const res = await fetch('https://bank.gov.ua/NBUStatService/v1/statdirectory/exchange?valcode=USD&json');
+        const data = await res.json();
+        if (data && data.length > 0) {
+            window.usdRate = data[0].rate;
+        }
+    } catch (e) {
+        console.error('Failed to fetch NBU rate', e);
+    }
+}
 
 function renderPropertyCard(prop, delay) {
     let specsHtml = '';
@@ -96,6 +109,7 @@ async function fetchAndRenderProperties() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+    fetchUsdRate();
     fetchAndRenderProperties();
 
     // Modal logic
@@ -126,7 +140,18 @@ window.openPropertyModal = function(id) {
 
     document.getElementById('modalImage').src = prop.image || '';
     document.getElementById('modalTitle').textContent = prop.title || '';
-    document.getElementById('modalPrice').textContent = prop.price || '';
+    
+    // Price with dynamic UAH conversion
+    let priceText = prop.price || '';
+    if (window.usdRate && priceText.includes('$')) {
+        const usdValue = parseInt(priceText.replace(/\D/g, ''), 10);
+        if (!isNaN(usdValue)) {
+            const uahValue = Math.round(usdValue * window.usdRate);
+            priceText = `${priceText} &bull; ${uahValue.toLocaleString('uk-UA')} грн`;
+        }
+    }
+    document.getElementById('modalPrice').innerHTML = priceText;
+    
     document.getElementById('modalAddress').textContent = prop.location || 'Невідома адреса';
     
     // Description: show loading if empty, though we will fetch it soon

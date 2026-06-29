@@ -106,7 +106,14 @@ async function fetchDetails() {
             const propData = await page.evaluate(() => {
                 const titleNode = document.querySelector('h1');
                 const priceNode = document.querySelector('.price');
-                const descNode = document.querySelector('#description .text');
+                
+                // Description can be in various places
+                let descNode = document.querySelector('#description .text');
+                if (!descNode) descNode = document.querySelector('#description');
+                if (!descNode) descNode = document.querySelector('.description-text');
+                if (!descNode) descNode = document.querySelector('.mb-20.text-b');
+                if (!descNode) descNode = document.querySelector('.text-b');
+                
                 const realtorLink = document.querySelector('a[href*="/realtor-"]');
                 
                 let realtorId = null;
@@ -183,21 +190,23 @@ async function fetchDetails() {
             if (bestMatch) {
                 console.log(`  Matched DB Object: "${bestMatch.title}"`);
                 
-                const rPhone = propData.realtorId && REALTORS[propData.realtorId] 
+                const mappedPhone = propData.realtorId && REALTORS[propData.realtorId] 
                                ? REALTORS[propData.realtorId] 
                                : '';
+                const priceStr = propData.price;
 
                 const { error: updateErr } = await supabase.from('properties').update({
+                    price: priceStr,
                     description: propData.description,
                     domria_url: targetUrl,
                     realtor_name: propData.realtorName,
-                    realtor_phone: rPhone
+                    realtor_phone: mappedPhone
                 }).eq('id', bestMatch.id);
 
                 if (updateErr) {
                     console.error('  Update error:', updateErr.message);
                 } else {
-                    console.log(`  ✅ Updated! Realtor: ${propData.realtorName} - ${rPhone}`);
+                    console.log(`  ✅ Updated! Realtor: ${propData.realtorName} - ${mappedPhone}`);
                     bestMatch.domria_url = targetUrl; // prevent matching again
                     updatedCount++;
                 }
