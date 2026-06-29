@@ -118,7 +118,6 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 window.openPropertyModal = function(id) {
-    alert("Function openPropertyModal called with ID: " + id);
     const prop = window.propertiesMap.get(String(id));
     if (!prop) {
         console.error("Property not found for id:", id);
