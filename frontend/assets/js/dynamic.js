@@ -67,7 +67,7 @@ async function fetchAndRenderProperties() {
             let htmlStr = '';
             window.propertiesMap.clear();
             properties.forEach((prop, index) => {
-                window.propertiesMap.set(prop.id, prop);
+                window.propertiesMap.set(String(prop.id), prop);
                 const delay = (index % 6) * 0.1;
                 htmlStr += renderPropertyCard(prop, delay);
             });
@@ -87,7 +87,6 @@ async function fetchAndRenderProperties() {
                     });
                 }
             });
-
             // Trigger filters update
             document.dispatchEvent(new Event('propertiesLoaded'));
         }
@@ -119,7 +118,8 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 window.openPropertyModal = function(id) {
-    const prop = window.propertiesMap.get(id);
+    alert("Function openPropertyModal called with ID: " + id);
+    const prop = window.propertiesMap.get(String(id));
     if (!prop) {
         console.error("Property not found for id:", id);
         return;
