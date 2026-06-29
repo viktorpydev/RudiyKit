@@ -244,31 +244,54 @@ window.openPropertyModal = function(id) {
         mapContainer.innerHTML = '';
     }
     
-    // Description and automatic extraction
-    let desc = prop.description || '';
-    
-    // Extract Area and Floor if they exist in description
-    let areaMatch = desc.match(/(Загальна площа|Площа)[\s:]*([\d\.]+\s*м²?)/i);
-    let floorMatch = desc.match(/(Поверх)[\s:]*([\d]+(\s*(із|з)\s*[\d]+)?)/i);
-    
-    let tagsHtml = '';
-    if (areaMatch) {
-        tagsHtml += `<span style="display:inline-block; background:#f0f2f5; padding:4px 10px; border-radius:6px; font-weight:600; margin-right:8px; font-size:0.9rem;">📐 Площа: ${areaMatch[2]}</span>`;
-    }
-    if (floorMatch) {
-        tagsHtml += `<span style="display:inline-block; background:#f0f2f5; padding:4px 10px; border-radius:6px; font-weight:600; margin-right:8px; font-size:0.9rem;">🏢 Поверх: ${floorMatch[2]}</span>`;
-    }
-    
-    if (tagsHtml) {
-        desc = `<div style="margin-bottom:15px;">${tagsHtml}</div>` + desc;
+    // Description and JSON extraction
+    let descObj = null;
+    let rawDesc = prop.description || '';
+    if (rawDesc.trim().startsWith('{') && rawDesc.trim().endsWith('}')) {
+        try {
+            descObj = JSON.parse(rawDesc);
+        } catch(e) {}
     }
 
-    if (desc) {
-        // Replace newlines with <br> and support bold tags if scraped
-        document.getElementById('modalDesc').innerHTML = desc.replace(/\n/g, '<br>');
-    } else {
-        document.getElementById('modalDesc').innerHTML = 'Детальний опис ще не завантажено...';
+    const charContainer = document.getElementById('modalCharacteristics');
+    if (charContainer) {
+        let charHtml = '';
+        if (descObj) {
+            if (descObj.area) charHtml += `<span style="display:inline-block; background:#f0f2f5; padding:6px 12px; border-radius:8px; font-weight:600; margin-right:8px; margin-bottom:8px; font-size:0.95rem;">📐 Площа: ${descObj.area}</span>`;
+            if (descObj.floor) charHtml += `<span style="display:inline-block; background:#f0f2f5; padding:6px 12px; border-radius:8px; font-weight:600; margin-right:8px; margin-bottom:8px; font-size:0.95rem;">🏢 Поверх: ${descObj.floor}</span>`;
+            if (descObj.year) charHtml += `<span style="display:inline-block; background:#f0f2f5; padding:6px 12px; border-radius:8px; font-weight:600; margin-right:8px; margin-bottom:8px; font-size:0.95rem;">📅 Рік забудови: ${descObj.year}</span>`;
+        } else {
+            // Fallback for old format
+            let areaMatch = rawDesc.match(/(Загальна площа|Площа)[\s:]*([\d\.]+\s*м²?)/i);
+            let floorMatch = rawDesc.match(/(Поверх)[\s:]*([\d]+(\s*(із|з)\s*[\d]+)?)/i);
+            if (areaMatch) charHtml += `<span style="display:inline-block; background:#f0f2f5; padding:6px 12px; border-radius:8px; font-weight:600; margin-right:8px; margin-bottom:8px; font-size:0.95rem;">📐 Площа: ${areaMatch[2]}</span>`;
+            if (floorMatch) charHtml += `<span style="display:inline-block; background:#f0f2f5; padding:6px 12px; border-radius:8px; font-weight:600; margin-right:8px; margin-bottom:8px; font-size:0.95rem;">🏢 Поверх: ${floorMatch[2]}</span>`;
+        }
+        charContainer.innerHTML = charHtml;
+        charContainer.style.display = charHtml ? 'block' : 'none';
     }
+
+    let finalDescHtml = '';
+    if (descObj) {
+        if (descObj.text) {
+            finalDescHtml += `<div style="line-height:1.6; margin-bottom:20px;">${descObj.text.replace(/\n/g, '<br>')}</div>`;
+        }
+        if (descObj.infra && descObj.infra.length > 0) {
+            finalDescHtml += `<h4 style="margin-bottom:12px; font-size:1.1rem;">📍 Інфраструктура поруч:</h4>`;
+            finalDescHtml += `<ul style="list-style-type:none; padding-left:0; display:grid; grid-template-columns: 1fr 1fr; gap:10px;">`;
+            descObj.infra.forEach(inf => {
+                finalDescHtml += `<li style="background:#fff; padding:10px; border-radius:8px; border:1px solid #eee; font-size:0.9rem;">
+                    <strong style="display:block; color:#333; margin-bottom:4px;">${inf.type}</strong>
+                    ${inf.time ? `<span style="color:#777; font-size:0.85rem;">⏱ ${inf.time}</span>` : ''}
+                </li>`;
+            });
+            finalDescHtml += `</ul>`;
+        }
+    } else {
+        finalDescHtml = rawDesc.replace(/\n/g, '<br>');
+    }
+
+    document.getElementById('modalDesc').innerHTML = finalDescHtml || 'Детальний опис ще не завантажено...';
 
     // Button: DOM.RIA
     const domriaBtn = document.getElementById('modalDomriaBtn');
