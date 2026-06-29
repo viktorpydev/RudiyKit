@@ -24,7 +24,7 @@ function renderPropertyCard(prop, delay) {
     }
 
     return `
-    <div class="property-card fade-in" style="transition-delay: ${delay}s; cursor: pointer;" data-category="${prop.category}" onclick="openPropertyModal('${prop.id}')">
+    <div class="property-card fade-in" style="transition-delay: ${delay}s; cursor: pointer;" data-category="${prop.category}" data-id="${prop.id}">
         <div class="property-card__image-wrapper">
             <img src="${prop.image}" alt="${prop.title}" class="property-card__image">
             <div class="prop-badges-top">
@@ -46,7 +46,7 @@ function renderPropertyCard(prop, delay) {
                 ${specsHtml}
             </div>
             <div class="prop-extra">${prop.extra || ''}</div>
-            <button class="btn btn--primary prop-btn-full" onclick="event.stopPropagation(); openPropertyModal('${prop.id}')">Детальніше</button>
+            <button class="btn btn--primary prop-btn-full" data-id="${prop.id}">Детальніше</button>
         </div>
     </div>`;
 }
@@ -72,6 +72,22 @@ async function fetchAndRenderProperties() {
                 htmlStr += renderPropertyCard(prop, delay);
             });
             grid.innerHTML = htmlStr;
+            
+            // Attach event listeners dynamically
+            const cards = grid.querySelectorAll('.property-card');
+            cards.forEach(card => {
+                const propId = card.getAttribute('data-id');
+                card.addEventListener('click', () => window.openPropertyModal(propId));
+                
+                const btn = card.querySelector('.prop-btn-full');
+                if (btn) {
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        window.openPropertyModal(propId);
+                    });
+                }
+            });
+
             // Trigger filters update
             document.dispatchEvent(new Event('propertiesLoaded'));
         }
