@@ -31,7 +31,15 @@ function renderPropertyCard(prop, delay) {
     // We get priceperm2 from db
     const m2PriceHtml = prop.priceperm2 ? `<span class="prop-price-m2"> &bull; ${prop.priceperm2}</span>` : '';
 
+    // Extract main USD price for card display
     let displayPrice = prop.price || '';
+    const usdMatch = displayPrice.match(/([\d\s]+)\s*\$/);
+    if (usdMatch) {
+        displayPrice = `${usdMatch[1].trim()} $`;
+    } else {
+        displayPrice = displayPrice.split('·')[0].replace(/за об\'єкт/g, '').trim();
+    }
+
     if (prop.category === 'rent' && displayPrice && !displayPrice.toLowerCase().includes('/міс')) {
         displayPrice += ' / міс.';
     }
