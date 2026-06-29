@@ -3,6 +3,8 @@ const supabaseUrl = 'https://qwunxhnjacfgvtsoflca.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF3dW54aG5qYWNmZ3Z0c29mbGNhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI0NTY0NjQsImV4cCI6MjA5ODAzMjQ2NH0.jGFZyCTnmkUzuqxpBcKSqDKq-oxDnfoK0npHBYQvTOM';
 const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
 
+let propertiesMap = new Map();
+
 function renderPropertyCard(prop, delay) {
     let specsHtml = '';
     if (prop.specs && Array.isArray(prop.specs)) {
@@ -22,7 +24,7 @@ function renderPropertyCard(prop, delay) {
     }
 
     return `
-    <div class="property-card fade-in" style="transition-delay: ${delay}s;" data-category="${prop.category}">
+    <div class="property-card fade-in" style="transition-delay: ${delay}s; cursor: pointer;" data-category="${prop.category}" onclick="openPropertyModal('${prop.id}')">
         <div class="property-card__image-wrapper">
             <img src="${prop.image}" alt="${prop.title}" class="property-card__image">
             <div class="prop-badges-top">
@@ -44,7 +46,7 @@ function renderPropertyCard(prop, delay) {
                 ${specsHtml}
             </div>
             <div class="prop-extra">${prop.extra || ''}</div>
-            <button class="btn btn--primary prop-btn-full" onclick="window.location.href='catalog.html'">Детальніше</button>
+            <button class="btn btn--primary prop-btn-full" onclick="event.stopPropagation(); openPropertyModal('${prop.id}')">Детальніше</button>
         </div>
     </div>`;
 }
@@ -63,7 +65,9 @@ async function fetchAndRenderProperties() {
         
         if (properties && properties.length > 0) {
             let htmlStr = '';
+            propertiesMap.clear();
             properties.forEach((prop, index) => {
+                propertiesMap.set(prop.id, prop);
                 const delay = (index % 6) * 0.1;
                 htmlStr += renderPropertyCard(prop, delay);
             });
@@ -78,4 +82,63 @@ async function fetchAndRenderProperties() {
 
 document.addEventListener('DOMContentLoaded', () => {
     fetchAndRenderProperties();
+
+    // Modal logic
+    const modal = document.getElementById('propertyModal');
+    const closeBtn = document.getElementById('closeModalBtn');
+    
+    if (closeBtn) {
+        closeBtn.addEventListener('click', () => {
+            modal.classList.remove('active');
+        });
+    }
+
+    if (modal) {
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.classList.remove('active');
+            }
+        });
+    }
 });
+
+function openPropertyModal(id) {
+    const prop = propertiesMap.get(id);
+    if (!prop) return;
+
+    document.getElementById('modalImage').src = prop.image || '';
+    document.getElementById('modalTitle').textContent = prop.title || '';
+    document.getElementById('modalPrice').textContent = prop.price || '';
+    document.getElementById('modalAddress').textContent = prop.location || 'Невідома адреса';
+    
+    // Description: show loading if empty, though we will fetch it soon
+    const descEl = document.getElementById('modalDesc');
+    descEl.innerHTML = (prop.description && prop.description.trim() !== '') 
+        ? prop.description.replace(/\\n/g, '<br>') 
+        : 'Детальний опис ще не завантажено...';
+
+    // Button: DOM.RIA
+    const domriaBtn = document.getElementById('modalDomriaBtn');
+    if (prop.domria_url) {
+        domriaBtn.href = prop.domria_url;
+        domriaBtn.style.display = 'inline-flex';
+    } else {
+        domriaBtn.style.display = 'none';
+    }
+
+    // Button: Realtor Call
+    const callBtn = document.getElementById('modalCallBtn');
+    const callBtnText = document.getElementById('modalCallBtnText');
+    if (prop.realtor_phone) {
+        callBtn.href = 'tel:' + prop.realtor_phone;
+        callBtnText.textContent = prop.realtor_name ? `Подзвонити (${prop.realtor_name})` : 'Подзвонити рієлтору';
+        callBtn.style.display = 'inline-flex';
+    } else {
+        // Fallback to agency phone if none specific
+        callBtn.href = 'tel:+380688995435';
+        callBtnText.textContent = 'Подзвонити рієлтору';
+        callBtn.style.display = 'inline-flex';
+    }
+
+    document.getElementById('propertyModal').classList.add('active');
+}
