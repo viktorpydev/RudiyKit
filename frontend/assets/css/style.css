@@ -1506,8 +1506,8 @@ img {
     margin-bottom: 2rem;
     box-shadow: 0 4px 15px rgba(0,0,0,0.05);
     border: 1px solid #EFEBE4;
-    transition: opa
-
+    transition: opacity 0.3s ease;
+}
 /* Modal Styles */
 .property-modal-overlay {
     position: fixed;
