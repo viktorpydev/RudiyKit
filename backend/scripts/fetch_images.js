@@ -155,22 +155,29 @@ async function main() {
 
             // Find matching DB property
             let bestMatch = null;
-            // Extract first price number: "99 000 $ за об'єкт · ..." -> 99000
-            function extractFirstPrice(str) {
-                const m = (str || '').match(/([\d\s]+)\s*\$/); // match digits before first $
-                if (m) return parseInt(m[1].replace(/\s/g, ''), 10);
-                const m2 = (str || '').match(/([\d\s]+)\s*грн/); // fallback: digits before грн
-                if (m2) return parseInt(m2[1].replace(/\s/g, ''), 10);
-                return parseInt((str || '').replace(/\D/g, ''), 10);
+            // Extract all prices: "45 000 грн · 999 $" -> Set(45000, 999)
+            function extractPrices(str) {
+                const prices = new Set();
+                const mUsd = (str || '').match(/([\d\s]+)\s*\$/);
+                if (mUsd) prices.add(parseInt(mUsd[1].replace(/\s/g, ''), 10));
+                const mUah = (str || '').match(/([\d\s]+)\s*грн/);
+                if (mUah) prices.add(parseInt(mUah[1].replace(/\s/g, ''), 10));
+                const fallback = parseInt((str || '').replace(/\D/g, ''), 10);
+                if (!isNaN(fallback) && prices.size === 0) prices.add(fallback);
+                return prices;
             }
-            const parsedPrice = extractFirstPrice(propData.price);
+            function pricesMatch(pricesA, pricesB) {
+                for (let a of pricesA) if (pricesB.has(a)) return true;
+                return false;
+            }
+            const scrapedPrices = extractPrices(propData.price);
 
             // Strategy 1: match by title keywords + price
             for (const dbProp of dbProps) {
                 if (dbProp.image && dbProp.image.includes('supabase')) continue; // already done
 
-                const dbPriceNum = extractFirstPrice(dbProp.price);
-                if (isNaN(parsedPrice) || isNaN(dbPriceNum) || dbPriceNum !== parsedPrice) continue;
+                const dbPrices = extractPrices(dbProp.price);
+                if (scrapedPrices.size === 0 || dbPrices.size === 0 || !pricesMatch(scrapedPrices, dbPrices)) continue;
 
                 // Check title word overlap
                 const scraped = propData.title.toLowerCase();
@@ -189,8 +196,8 @@ async function main() {
             if (!bestMatch) {
                 for (const dbProp of dbProps) {
                     if (dbProp.image && dbProp.image.includes('supabase')) continue;
-                    const dbPriceNum = extractFirstPrice(dbProp.price);
-                    if (isNaN(parsedPrice) || isNaN(dbPriceNum) || dbPriceNum !== parsedPrice) continue;
+                    const dbPrices = extractPrices(dbProp.price);
+                    if (scrapedPrices.size === 0 || dbPrices.size === 0 || !pricesMatch(scrapedPrices, dbPrices)) continue;
 
                     if (dbProp.extra && propData.description) {
                         const dbDesc = dbProp.extra.substring(0, 80).toLowerCase();
@@ -205,10 +212,11 @@ async function main() {
             }
 
             // Strategy 3: unique price match
-            if (!bestMatch && !isNaN(parsedPrice)) {
+            if (!bestMatch && scrapedPrices.size > 0) {
                 const priceMatches = dbProps.filter(p => {
                     if (p.image && p.image.includes('supabase')) return false;
-                    return extractFirstPrice(p.price) === parsedPrice;
+                    const dbP = extractPrices(p.price);
+                    return pricesMatch(scrapedPrices, dbP);
                 });
                 if (priceMatches.length === 1) {
                     bestMatch = priceMatches[0];
