@@ -236,10 +236,28 @@ window.openPropertyModal = function(id) {
         mapContainer.innerHTML = '';
     }
     
-    // Description
-    if (prop.description) {
+    // Description and automatic extraction
+    let desc = prop.description || '';
+    
+    // Extract Area and Floor if they exist in description
+    let areaMatch = desc.match(/(Загальна площа|Площа)[\s:]*([\d\.]+\s*м²?)/i);
+    let floorMatch = desc.match(/(Поверх)[\s:]*([\d]+(\s*(із|з)\s*[\d]+)?)/i);
+    
+    let tagsHtml = '';
+    if (areaMatch) {
+        tagsHtml += `<span style="display:inline-block; background:#f0f2f5; padding:4px 10px; border-radius:6px; font-weight:600; margin-right:8px; font-size:0.9rem;">📐 Площа: ${areaMatch[2]}</span>`;
+    }
+    if (floorMatch) {
+        tagsHtml += `<span style="display:inline-block; background:#f0f2f5; padding:4px 10px; border-radius:6px; font-weight:600; margin-right:8px; font-size:0.9rem;">🏢 Поверх: ${floorMatch[2]}</span>`;
+    }
+    
+    if (tagsHtml) {
+        desc = `<div style="margin-bottom:15px;">${tagsHtml}</div>` + desc;
+    }
+
+    if (desc) {
         // Replace newlines with <br> and support bold tags if scraped
-        document.getElementById('modalDesc').innerHTML = prop.description.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+        document.getElementById('modalDesc').innerHTML = desc.replace(/\n/g, '<br>');
     } else {
         document.getElementById('modalDesc').innerHTML = 'Детальний опис ще не завантажено...';
     }
