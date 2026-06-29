@@ -3,7 +3,7 @@ const supabaseUrl = 'https://qwunxhnjacfgvtsoflca.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF3dW54aG5qYWNmZ3Z0c29mbGNhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI0NTY0NjQsImV4cCI6MjA5ODAzMjQ2NH0.jGFZyCTnmkUzuqxpBcKSqDKq-oxDnfoK0npHBYQvTOM';
 const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
 
-let propertiesMap = new Map();
+window.propertiesMap = new Map();
 
 function renderPropertyCard(prop, delay) {
     let specsHtml = '';
@@ -65,9 +65,9 @@ async function fetchAndRenderProperties() {
         
         if (properties && properties.length > 0) {
             let htmlStr = '';
-            propertiesMap.clear();
+            window.propertiesMap.clear();
             properties.forEach((prop, index) => {
-                propertiesMap.set(prop.id, prop);
+                window.propertiesMap.set(prop.id, prop);
                 const delay = (index % 6) * 0.1;
                 htmlStr += renderPropertyCard(prop, delay);
             });
@@ -102,9 +102,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-function openPropertyModal(id) {
-    const prop = propertiesMap.get(id);
-    if (!prop) return;
+window.openPropertyModal = function(id) {
+    const prop = window.propertiesMap.get(id);
+    if (!prop) {
+        console.error("Property not found for id:", id);
+        return;
+    }
 
     document.getElementById('modalImage').src = prop.image || '';
     document.getElementById('modalTitle').textContent = prop.title || '';
@@ -113,8 +116,9 @@ function openPropertyModal(id) {
     
     // Description: show loading if empty, though we will fetch it soon
     const descEl = document.getElementById('modalDesc');
-    descEl.innerHTML = (prop.description && prop.description.trim() !== '') 
-        ? prop.description.replace(/\\n/g, '<br>') 
+    let desc = prop.description || '';
+    descEl.innerHTML = (desc.trim() !== '') 
+        ? desc.replace(/\n/g, '<br>').replace(/\\n/g, '<br>') 
         : 'Детальний опис ще не завантажено...';
 
     // Button: DOM.RIA
