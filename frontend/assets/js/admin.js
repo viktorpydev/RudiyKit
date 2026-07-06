@@ -1,8 +1,9 @@
 let currentProperties = [];
+let currentRealtors = [];
 
 async function initAdmin(user) {
     document.getElementById('userInfo').textContent = user.email;
-    await loadProperties();
+    await Promise.all([loadProperties(), loadRealtors()]);
 }
 
 async function loadProperties() {
@@ -21,6 +22,80 @@ async function loadProperties() {
 
     currentProperties = data;
     renderTable();
+}
+
+async function loadRealtors() {
+    const tbody = document.getElementById('realtorsTableBody');
+    tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 20px;">Завантаження...</td></tr>';
+    
+    const { data, error } = await supabaseClient.from('realtors')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+    if (error) {
+        tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: red;">Помилка завантаження: ${error.message}</td></tr>`;
+        return;
+    }
+
+    currentRealtors = data;
+    renderRealtorsTable();
+    populateRealtorSelect();
+}
+
+function populateRealtorSelect() {
+    const select = document.getElementById('propRealtorId');
+    select.innerHTML = '<option value="">Оберіть рієлтора...</option>';
+    currentRealtors.forEach(r => {
+        select.innerHTML += `<option value="${r.id}">${r.full_name}</option>`;
+    });
+}
+
+function renderRealtorsTable() {
+    const tbody = document.getElementById('realtorsTableBody');
+    tbody.innerHTML = '';
+
+    if (currentRealtors.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 20px;">Рієлторів поки немає</td></tr>';
+        return;
+    }
+
+    currentRealtors.forEach(r => {
+        tbody.innerHTML += `
+            <tr>
+                <td><img src="${r.photo_url || 'https://via.placeholder.com/60x60?text=No+Photo'}" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;"></td>
+                <td>${r.full_name}</td>
+                <td>${r.phone || '—'}</td>
+                <td>
+                    <div class="action-btns">
+                        <button class="btn btn-outline" onclick="editRealtor('${r.id}')">Редагувати</button>
+                        <button class="btn btn-danger" onclick="deleteRealtor('${r.id}')">Видалити</button>
+                    </div>
+                </td>
+            </tr>
+        `;
+    });
+}
+
+function switchTab(tab) {
+    document.getElementById('nav-properties').classList.remove('active');
+    document.getElementById('nav-realtors').classList.remove('active');
+    
+    document.getElementById('section-properties').style.display = 'none';
+    document.getElementById('section-realtors').style.display = 'none';
+
+    if (tab === 'properties') {
+        document.getElementById('nav-properties').classList.add('active');
+        document.getElementById('section-properties').style.display = 'block';
+        document.getElementById('page-title').textContent = 'Управління об\\'єктами';
+        document.getElementById('btn-add-item').innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg> Додати об\\'єкт';
+        document.getElementById('btn-add-item').onclick = openModal;
+    } else {
+        document.getElementById('nav-realtors').classList.add('active');
+        document.getElementById('section-realtors').style.display = 'block';
+        document.getElementById('page-title').textContent = 'Управління рієлторами';
+        document.getElementById('btn-add-item').innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg> Додати рієлтора';
+        document.getElementById('btn-add-item').onclick = openRealtorModal;
+    }
 }
 
 function renderTable() {
@@ -138,6 +213,74 @@ function editProperty(id) {
         document.getElementById('imagePreview').style.display = 'block';
         document.getElementById('propImageUrl').value = prop.image;
     }
+    document.getElementById('propRealtorId').value = prop.realtor_id || '';
+}
+
+function openRealtorModal() {
+    document.getElementById('realtorForm').reset();
+    document.getElementById('realtorId').value = '';
+    document.getElementById('realtorModalTitle').textContent = 'Додати рієлтора';
+    document.getElementById('realtorModal').classList.add('active');
+}
+
+function closeRealtorModal() {
+    document.getElementById('realtorModal').classList.remove('active');
+}
+
+function editRealtor(id) {
+    const r = currentRealtors.find(x => x.id === id);
+    if (!r) return;
+    openRealtorModal();
+    document.getElementById('realtorModalTitle').textContent = 'Редагувати рієлтора';
+    document.getElementById('realtorId').value = r.id;
+    document.getElementById('realtorName').value = r.full_name || '';
+    document.getElementById('realtorPhone').value = r.phone || '';
+    document.getElementById('realtorPhotoUrl').value = r.photo_url || '';
+    document.getElementById('realtorRiaId').value = r.ria_id || '';
+}
+
+async function saveRealtor(e) {
+    e.preventDefault();
+    const saveBtn = document.getElementById('btnSaveRealtor');
+    saveBtn.disabled = true;
+    saveBtn.textContent = 'Збереження...';
+
+    try {
+        const id = document.getElementById('realtorId').value;
+        const payload = {
+            full_name: document.getElementById('realtorName').value,
+            phone: document.getElementById('realtorPhone').value,
+            photo_url: document.getElementById('realtorPhotoUrl').value,
+            ria_id: document.getElementById('realtorRiaId').value || null
+        };
+
+        if (id) {
+            const { error } = await supabaseClient.from('realtors').update(payload).eq('id', id);
+            if (error) throw error;
+        } else {
+            const { error } = await supabaseClient.from('realtors').insert([payload]);
+            if (error) throw error;
+        }
+
+        closeRealtorModal();
+        await loadRealtors();
+    } catch (error) {
+        alert(error.message);
+    } finally {
+        saveBtn.disabled = false;
+        saveBtn.textContent = 'Зберегти';
+    }
+}
+
+async function deleteRealtor(id) {
+    if (!confirm('Ви впевнені, що хочете видалити цього рієлтора? Об\\'єкти, прив\\'язані до нього, залишаться, але без вказаного рієлтора.')) return;
+
+    const { error } = await supabaseClient.from('realtors').delete().eq('id', id);
+    if (error) {
+        alert('Помилка видалення: ' + error.message);
+    } else {
+        await loadRealtors();
+    }
 }
 
 async function deleteProperty(id) {
@@ -220,7 +363,8 @@ async function saveProperty(e) {
             description: description,
             tag: 'Нове',
             tagcolor: '#ef4444',
-            typebadge: 'Нерухомість'
+            typebadge: 'Нерухомість',
+            realtor_id: document.getElementById('propRealtorId').value || null
         };
 
         if (id) {

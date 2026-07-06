@@ -141,7 +141,7 @@ async function fetchAndRenderProperties() {
     try {
         const { data: properties, error } = await supabaseClient
             .from('properties')
-            .select('*')
+            .select('*, realtors(*)')
             .order('order_index', { ascending: true })
             .order('created_at', { ascending: false });
 
@@ -369,9 +369,22 @@ window.openPropertyModal = function(id) {
     // Button: Realtor Call
     const callBtn = document.getElementById('modalCallBtn');
     const callBtnText = document.getElementById('modalCallBtnText');
-    if (prop.realtor_phone) {
-        callBtn.href = 'tel:' + prop.realtor_phone;
-        callBtnText.textContent = prop.realtor_name ? `Подзвонити (${prop.realtor_name})` : 'Подзвонити рієлтору';
+    
+    // Check if linked to realtor or has legacy phone
+    let phone = null;
+    let name = null;
+    
+    if (prop.realtors && prop.realtors.phone) {
+        phone = prop.realtors.phone;
+        name = prop.realtors.full_name;
+    } else if (prop.realtor_phone) {
+        phone = prop.realtor_phone;
+        name = prop.realtor_name;
+    }
+
+    if (phone) {
+        callBtn.href = 'tel:' + phone;
+        callBtnText.textContent = name ? `Подзвонити (${name})` : 'Подзвонити рієлтору';
         callBtn.style.display = 'inline-flex';
     } else {
         // Fallback to agency phone if none specific
