@@ -44,9 +44,17 @@ function renderPropertyCard(prop, delay) {
         displayPrice += ' / міс.';
     }
 
+    let phone = '';
+    if (prop.specs && Array.isArray(prop.specs)) {
+        const phoneSpec = prop.specs.find(s => s.icon && s.icon.includes('📞') || (s.text && String(s.text).includes('+38')));
+        if (phoneSpec) phone = phoneSpec.text.replace(/[^\d\+]/g, '');
+    }
+
+    const domRiaUrl = prop.url ? prop.url : '#';
+
     return `
-    <div class="property-card fade-in" style="transition-delay: ${delay}s; cursor: pointer;" data-category="${prop.category}" data-id="${prop.id}">
-        <div class="property-card__image-wrapper">
+    <div class="property-card fade-in" style="transition-delay: ${delay}s;" data-category="${prop.category}" data-id="${prop.id}">
+        <div class="property-card__image-wrapper" onclick="if('${domRiaUrl}' !== '#') window.open('${domRiaUrl}', '_blank')" style="cursor: pointer;">
             <img src="${prop.image}" alt="${prop.title}" class="property-card__image">
             <div class="prop-badges-top">
                 ${tagHtml}
@@ -57,7 +65,7 @@ function renderPropertyCard(prop, delay) {
             </button>
         </div>
         <div class="property-card__content">
-            <h3 class="property-card__title">${prop.title}</h3>
+            <h3 class="property-card__title" onclick="if('${domRiaUrl}' !== '#') window.open('${domRiaUrl}', '_blank')" style="cursor: pointer;">${prop.title}</h3>
             <div class="prop-price-row">
                 <span class="prop-price">${displayPrice}</span>
                 ${m2PriceHtml}
@@ -67,7 +75,16 @@ function renderPropertyCard(prop, delay) {
                 ${specsHtml}
             </div>
             <div class="prop-extra">${prop.extra || ''}</div>
-            <button class="btn btn--primary prop-btn-full" data-id="${prop.id}">Детальніше</button>
+            
+            <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 15px;">
+                ${phone ? `<a href="tel:${phone}" class="btn btn--primary prop-btn-full" style="text-align: center; display: flex; justify-content: center; align-items: center; gap: 8px;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                    Подзвонити рієлтору
+                </a>` : ''}
+                <a href="${domRiaUrl}" target="_blank" class="btn btn--outline prop-btn-full" style="text-align: center;">
+                    Перейти на DOM.RIA
+                </a>
+            </div>
         </div>
     </div>`;
 }
@@ -94,20 +111,6 @@ async function fetchAndRenderProperties() {
             });
             grid.innerHTML = htmlStr;
             
-            // Attach event listeners dynamically
-            const cards = grid.querySelectorAll('.property-card');
-            cards.forEach(card => {
-                const propId = card.getAttribute('data-id');
-                card.addEventListener('click', () => window.openPropertyModal(propId));
-                
-                const btn = card.querySelector('.prop-btn-full');
-                if (btn) {
-                    btn.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        window.openPropertyModal(propId);
-                    });
-                }
-            });
             // Trigger filters update
             document.dispatchEvent(new Event('propertiesLoaded'));
         }
