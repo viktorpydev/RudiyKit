@@ -42,8 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // 3. Property Filtering
-    const filterBtns = document.querySelectorAll('.filter-btn');
+    // 3. Modern Property Filtering
     let propertyCards = Array.from(document.querySelectorAll('.property-card'));
     const catalogGrid = document.querySelector('.properties__grid');
     
@@ -60,24 +59,41 @@ document.addEventListener('DOMContentLoaded', () => {
         catalogGrid.parentNode.insertBefore(nearbyMsg, catalogGrid);
     }
 
-    const districtFilterSelect = document.getElementById('districtFilter');
-    const priceFilterSelect = document.getElementById('priceFilter');
     const sortSelect = document.getElementById('sortSelect');
+    
+    // State for modern filters
+    const filterState = {
+        category: 'all',
+        district: 'all',
+        operation: 'all',
+        priceMin: 0,
+        priceMax: 1000000
+    };
 
     function getPrice(card) {
+        const propId = card.getAttribute('data-id');
+        if (propId && window.propertiesMap && window.propertiesMap.has(propId)) {
+            const prop = window.propertiesMap.get(propId);
+            const displayPrice = prop.price || '';
+            const usdMatch = displayPrice.match(/([\d\s]+)\s*\$/);
+            if (usdMatch) {
+                return parseInt(usdMatch[1].replace(/\s/g, ''), 10);
+            }
+        }
+        
+        // Fallback
         const priceEl = card.querySelector('.prop-price');
         if (!priceEl) return 0;
         const priceText = priceEl.innerText;
+        // If UAH is displayed, it might break fallback but usually propertiesMap works
         return parseInt(priceText.replace(/\D/g, ''), 10) || 0;
     }
 
-    function applyFilters(category, query, fallback = false) {
+    function applyFilters(query = '', fallback = false) {
         if (!propertyCards || !propertyCards.length) return;
         
         const lowerQuery = query ? query.toLowerCase() : '';
         let visibleCount = 0;
-        const selectedDistrict = districtFilterSelect ? districtFilterSelect.value : 'all';
-        const selectedPrice = priceFilterSelect ? priceFilterSelect.value : 'all';
         
         // Sorting
         if (sortSelect && !fallback) {
@@ -107,22 +123,26 @@ document.addEventListener('DOMContentLoaded', () => {
             const price = getPrice(card);
             
             // Check category match
-            let catMatch = (category === 'all' || cardCat === category);
+            let catMatch = (filterState.category === 'all' || cardCat === filterState.category);
 
             // Check district match
             let districtMatch = true;
-            if (selectedDistrict !== 'all') {
-                districtMatch = cardLoc.includes(selectedDistrict);
+            if (filterState.district !== 'all') {
+                districtMatch = cardLoc.includes(filterState.district);
+            }
+            
+            // Check operation match
+            let opMatch = true;
+            if (filterState.operation === 'sale') {
+                opMatch = cardTitle.includes('продаж');
+            } else if (filterState.operation === 'rent') {
+                opMatch = cardTitle.includes('оренд');
             }
 
             // Check price match
-            let priceMatch = true;
-            if (selectedPrice !== 'all') {
-                const [min, max] = selectedPrice.split('-').map(Number);
-                priceMatch = price >= min && price <= max;
-            }
+            let priceMatch = (price >= filterState.priceMin && price <= filterState.priceMax);
             
-            // Check query match (in normal mode)
+            // Check query match
             let queryMatch = true;
             if (!fallback && lowerQuery) {
                 const genericWords = ['вулиця', 'вул.', 'вул', 'проспект', 'просп.', 'просп', 'провулок', 'пров.', 'пров'];
@@ -135,11 +155,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
             
-            // Clear any pending timeouts on this card to prevent race conditions
             if (card.hideTimeoutId) clearTimeout(card.hideTimeoutId);
             if (card.showTimeoutId) clearTimeout(card.showTimeoutId);
 
-            if (catMatch && queryMatch && districtMatch && priceMatch) {
+            if (catMatch && queryMatch && districtMatch && priceMatch && opMatch) {
                 card.style.display = 'flex';
                 card.showTimeoutId = setTimeout(() => {
                     card.style.opacity = '1';
@@ -156,35 +175,225 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         // Nearby logic
+        // Nearby / Not found logic
         if (nearbyMsg) {
             if (visibleCount === 0 && !fallback) {
-                nearbyMsg.style.display = 'block';
-                setTimeout(() => nearbyMsg.style.opacity = '1', 10);
-                applyFilters(category, '', true); // retry without query
+                // If there was a text query, try fallback without it
+                if (query) {
+                    const fallbackCount = applyFilters('', true); // returns number of visible cards
+                    if (fallbackCount > 0) {
+                        nearbyMsg.innerHTML = `
+                            <h3 style="margin-bottom: 0.5rem; color: var(--clr-heading);">На жаль, за вашим запитом точних збігів немає 😔</h3>
+                            <p style="color: var(--clr-text-light);">Але ми підібрали для вас інші актуальні пропозиції!</p>
+                        `;
+                        nearbyMsg.style.display = 'block';
+                        setTimeout(() => nearbyMsg.style.opacity = '1', 10);
+                    } else {
+                        nearbyMsg.innerHTML = `
+                            <h3 style="margin-bottom: 0.5rem; color: var(--clr-heading);">На жаль, за обраними фільтрами нічого не знайдено 😔</h3>
+                            <p style="color: var(--clr-text-light);">Спробуйте змінити критерії пошуку.</p>
+                        `;
+                        nearbyMsg.style.display = 'block';
+                        setTimeout(() => nearbyMsg.style.opacity = '1', 10);
+                    }
+                } else {
+                    // No text query, just filter mismatch
+                    nearbyMsg.innerHTML = `
+                        <h3 style="margin-bottom: 0.5rem; color: var(--clr-heading);">На жаль, за обраними фільтрами нічого не знайдено 😔</h3>
+                        <p style="color: var(--clr-text-light);">Спробуйте змінити критерії пошуку.</p>
+                    `;
+                    nearbyMsg.style.display = 'block';
+                    setTimeout(() => nearbyMsg.style.opacity = '1', 10);
+                }
             } else if (visibleCount > 0 && !fallback) {
                 nearbyMsg.style.display = 'none';
                 nearbyMsg.style.opacity = '0';
             }
         }
+        
+        return visibleCount;
     }
 
-    filterBtns.forEach(btn => {
+    const triggerFiltersUpdate = () => {
+        const currentQuery = document.getElementById('search-input') ? document.getElementById('search-input').value.trim() : '';
+        applyFilters(currentQuery);
+    };
+
+    // Make triggerFiltersUpdate available globally for dynamic.js
+    window.triggerFiltersUpdate = triggerFiltersUpdate;
+
+    // Currency Toggle Logic
+    window.currentCurrency = 'USD'; // Default
+    
+    const currencyBtns = document.querySelectorAll('.currency-btn');
+    currencyBtns.forEach(btn => {
         btn.addEventListener('click', () => {
-            filterBtns.forEach(b => b.classList.remove('active'));
+            if (btn.classList.contains('active')) return;
+            
+            // Switch active state
+            currencyBtns.forEach(b => {
+                b.classList.remove('active');
+                b.style.background = 'transparent';
+                b.style.color = 'var(--clr-text)';
+            });
             btn.classList.add('active');
-            const filterValue = btn.getAttribute('data-filter');
-            const currentQuery = document.getElementById('search-input') ? document.getElementById('search-input').value.trim() : '';
-            applyFilters(filterValue, currentQuery);
+            btn.style.background = 'var(--clr-primary)';
+            btn.style.color = 'white';
+            
+            const newCurrency = btn.getAttribute('data-currency');
+            const oldCurrency = window.currentCurrency;
+            window.currentCurrency = newCurrency;
+            
+            // Update filter inputs UI to reflect new currency approximation
+            const minInput = document.getElementById('priceMinInput');
+            const maxInput = document.getElementById('priceMaxInput');
+            const rate = window.usdRate || 41;
+            
+            if (oldCurrency === 'USD' && newCurrency === 'UAH') {
+                if (minInput.value) minInput.value = Math.round((parseInt(minInput.value) * rate) / 1000) * 1000;
+                if (maxInput.value) maxInput.value = Math.round((parseInt(maxInput.value) * rate) / 1000) * 1000;
+            } else if (oldCurrency === 'UAH' && newCurrency === 'USD') {
+                if (minInput.value) minInput.value = Math.round((parseInt(minInput.value) / rate) / 1000) * 1000;
+                if (maxInput.value) maxInput.value = Math.round((parseInt(maxInput.value) / rate) / 1000) * 1000;
+            }
+            
+            // Update currency symbols in price dropdown
+            const curSyms = document.querySelectorAll('.currency-symbol');
+            curSyms.forEach(sym => sym.innerText = newCurrency === 'UAH' ? '₴' : '$');
+            
+            // Trigger a re-render of properties so their display price updates
+            if (typeof window.reRenderProperties === 'function') {
+                window.reRenderProperties();
+            } else if (typeof fetchAndRenderProperties === 'function') {
+                fetchAndRenderProperties();
+            }
+            
+            // Also update the price label if active
+            const filterPrice = document.getElementById('filterPrice');
+            const label = filterPrice ? filterPrice.querySelector('.modern-filter-label') : null;
+            if (label && label.innerText !== 'Будь-яка ціна') {
+                const curSym = newCurrency === 'UAH' ? '₴' : '$';
+                label.innerText = minInput.value + ' - ' + maxInput.value + ' ' + curSym;
+            }
         });
     });
 
-    const triggerFiltersUpdate = () => {
-        const currentCat = document.querySelector('.filter-btn.active') ? document.querySelector('.filter-btn.active').getAttribute('data-filter') : 'all';
-        const currentQuery = document.getElementById('search-input') ? document.getElementById('search-input').value.trim() : '';
-        applyFilters(currentCat, currentQuery);
-    };
+    // Modern Filters Logic
+    const modernFilters = document.querySelectorAll('.modern-filter');
+    modernFilters.forEach(filter => {
+        const btn = filter.querySelector('.modern-filter-btn');
+        const dropdown = filter.querySelector('.modern-filter-dropdown');
+        const label = filter.querySelector('.modern-filter-label');
+        const type = filter.getAttribute('data-type');
+        
+        if (btn && dropdown) {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                // Close others
+                modernFilters.forEach(f => {
+                    if (f !== filter) {
+                        f.querySelector('.modern-filter-dropdown').classList.remove('show');
+                    }
+                });
+                // Toggle current
+                dropdown.classList.toggle('show');
+            });
+            
+            if (type !== 'price') {
+                const options = dropdown.querySelectorAll('.modern-filter-option');
+                options.forEach(opt => {
+                    opt.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        options.forEach(o => o.classList.remove('selected'));
+                        opt.classList.add('selected');
+                        
+                        const val = opt.getAttribute('data-value');
+                        const text = opt.innerText;
+                        
+                        if (val === 'all') {
+                            label.innerText = type === 'category' ? 'Усі типи' : (type === 'district' ? 'Усі райони' : 'Усі операції');
+                            btn.classList.remove('active');
+                        } else {
+                            label.innerText = text;
+                            btn.classList.add('active');
+                        }
+                        
+                        filterState[type] = val;
+                        dropdown.classList.remove('show');
+                        triggerFiltersUpdate();
+                    });
+                });
+            }
+        }
+    });
+    
+    // Close dropdowns on outside click
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.modern-filter')) {
+            modernFilters.forEach(filter => {
+                const dropdown = filter.querySelector('.modern-filter-dropdown');
+                if (dropdown) dropdown.classList.remove('show');
+            });
+        }
+    });
 
-    // Custom Dropdown Logic
+    // Price Filter (Inputs Only)
+    const filterPrice = document.getElementById('filterPrice');
+    if (filterPrice) {
+        const minInput = document.getElementById('priceMinInput');
+        const maxInput = document.getElementById('priceMaxInput');
+        const applyBtn = document.getElementById('applyPriceBtn');
+        const label = filterPrice.querySelector('.modern-filter-label');
+        const btn = filterPrice.querySelector('.modern-filter-btn');
+        const dropdown = filterPrice.querySelector('.modern-filter-dropdown');
+        
+        function updateInputsUI() {
+            let minVal = parseInt(minInput.value) || 0;
+            let maxVal = parseInt(maxInput.value) || 1000000000;
+            
+            if (minVal < 0) minVal = 0;
+            if (maxVal < 0) maxVal = 0;
+            
+            if (minVal > maxVal) {
+                minVal = maxVal;
+            }
+            minInput.value = minVal;
+            maxInput.value = maxVal;
+        }
+        
+        minInput.addEventListener('change', updateInputsUI);
+        maxInput.addEventListener('change', updateInputsUI);
+        
+        applyBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            updateInputsUI();
+            
+            // The inputs are in the current currency, we convert them to USD for internal filtering
+            // because our getPrice(card) logic returns the USD value always.
+            const rate = window.currentCurrency === 'UAH' ? (window.usdRate || 41) : 1;
+            filterState.priceMin = (parseInt(minInput.value) || 0) / rate;
+            filterState.priceMax = (parseInt(maxInput.value) || 1000000000) / rate;
+            
+            if (parseInt(minInput.value) === 0 && parseInt(maxInput.value) >= 1000000) {
+                label.innerText = 'Будь-яка ціна';
+                btn.classList.remove('active');
+            } else {
+                const curSym = window.currentCurrency === 'UAH' ? '₴' : '$';
+                label.innerText = minInput.value + ' - ' + maxInput.value + ' ' + curSym;
+                btn.classList.add('active');
+            }
+            
+            dropdown.classList.remove('show');
+            triggerFiltersUpdate();
+        });
+        
+        // Prevent click inside dropdown from closing it
+        dropdown.addEventListener('click', (e) => {
+            e.stopPropagation();
+        });
+    }
+
+    // Custom Dropdown Logic (for Sort)
     const customDropdowns = document.querySelectorAll('.custom-dropdown');
     customDropdowns.forEach(dropdown => {
         const trigger = dropdown.querySelector('.custom-dropdown__trigger');
@@ -192,49 +401,32 @@ document.addEventListener('DOMContentLoaded', () => {
         const options = dropdown.querySelectorAll('.custom-dropdown__option');
         const hiddenInput = dropdown.querySelector('input[type="hidden"]');
         
-        trigger.addEventListener('click', (e) => {
-            e.stopPropagation();
-            customDropdowns.forEach(d => {
-                if(d !== dropdown) d.classList.remove('open');
-            });
-            dropdown.classList.toggle('open');
-        });
-        
-        options.forEach(option => {
-            option.addEventListener('click', (e) => {
+        if (trigger) {
+            trigger.addEventListener('click', (e) => {
                 e.stopPropagation();
-                options.forEach(opt => opt.classList.remove('selected'));
-                option.classList.add('selected');
-                triggerText.innerText = option.querySelector('.option-title').innerText;
-                hiddenInput.value = option.getAttribute('data-value');
-                dropdown.classList.remove('open');
-                triggerFiltersUpdate();
+                customDropdowns.forEach(d => {
+                    if(d !== dropdown) d.classList.remove('open');
+                });
+                dropdown.classList.toggle('open');
             });
-        });
+            
+            options.forEach(option => {
+                option.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    options.forEach(opt => opt.classList.remove('selected'));
+                    option.classList.add('selected');
+                    triggerText.innerText = option.querySelector('.option-title').innerText;
+                    hiddenInput.value = option.getAttribute('data-value');
+                    dropdown.classList.remove('open');
+                    triggerFiltersUpdate();
+                });
+            });
+        }
     });
 
     document.addEventListener('click', () => {
         customDropdowns.forEach(dropdown => dropdown.classList.remove('open'));
     });
-
-    const toggleAdvancedFiltersBtn = document.getElementById('toggleAdvancedFilters');
-    const advancedFiltersPanel = document.getElementById('advancedFiltersPanel');
-    if (toggleAdvancedFiltersBtn && advancedFiltersPanel) {
-        toggleAdvancedFiltersBtn.addEventListener('click', () => {
-            advancedFiltersPanel.classList.toggle('show');
-            if (advancedFiltersPanel.classList.contains('show')) {
-                toggleAdvancedFiltersBtn.classList.add('active');
-                toggleAdvancedFiltersBtn.style.backgroundColor = 'var(--clr-primary)';
-                toggleAdvancedFiltersBtn.style.color = 'var(--clr-white)';
-                toggleAdvancedFiltersBtn.style.borderColor = 'var(--clr-primary)';
-            } else {
-                toggleAdvancedFiltersBtn.classList.remove('active');
-                toggleAdvancedFiltersBtn.style.backgroundColor = '';
-                toggleAdvancedFiltersBtn.style.color = 'var(--clr-text)';
-                toggleAdvancedFiltersBtn.style.borderColor = '#eee';
-            }
-        });
-    }
     // 4. Hero Search Tabs Interactivity
     const searchTabs = document.querySelectorAll('.search-tab');
     searchTabs.forEach(tab => {

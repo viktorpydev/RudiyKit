@@ -31,17 +31,38 @@ function renderPropertyCard(prop, delay) {
     // We get priceperm2 from db
     const m2PriceHtml = prop.priceperm2 ? `<span class="prop-price-m2"> &bull; ${prop.priceperm2}</span>` : '';
 
-    // Extract main USD price for card display
-    let displayPrice = prop.price || '';
-    const usdMatch = displayPrice.match(/([\d\s]+)\s*\$/);
+    // Extract prices
+    let usdStr = '';
+    let uahStr = '';
+    let rawPrice = prop.price || '';
+    
+    const usdMatch = rawPrice.match(/([\d\s]+)\s*\$/);
     if (usdMatch) {
-        displayPrice = `${usdMatch[1].trim()} $`;
+        usdStr = `${usdMatch[1].trim()} $`;
     } else {
-        displayPrice = displayPrice.split('·')[0].replace(/за об\'єкт/g, '').trim();
+        usdStr = rawPrice.split('·')[0].replace(/за об\'єкт/g, '').trim();
+    }
+    
+    const uahMatch = rawPrice.match(/([\d\s]+)\s*грн/);
+    if (uahMatch) {
+        uahStr = `${uahMatch[1].trim()} ₴`;
+    } else if (usdMatch) {
+        const usdVal = parseInt(usdMatch[1].replace(/\s/g, ''));
+        const rate = window.usdRate || 41;
+        uahStr = `${(usdVal * rate).toLocaleString('uk-UA').replace(/,/g, ' ')} ₴`;
+    }
+    
+    const isUah = window.currentCurrency === 'UAH';
+    let mainPrice = isUah ? uahStr : usdStr;
+    let secondaryPrice = isUah ? usdStr : uahStr;
+    
+    let displayPrice = `<span style="font-weight: 700; color: var(--clr-heading);">${mainPrice}</span>`;
+    if (secondaryPrice) {
+        displayPrice += `<span style="font-size: 0.85rem; color: #888; margin-left: 6px; font-weight: 400;">~ ${secondaryPrice}</span>`;
     }
 
-    if (prop.category === 'rent' && displayPrice && !displayPrice.toLowerCase().includes('/міс')) {
-        displayPrice += ' / міс.';
+    if (prop.category === 'rent' && !rawPrice.toLowerCase().includes('/міс')) {
+        displayPrice += ' <span style="font-size: 0.85rem; color: #888;">/ міс.</span>';
     }
 
     let phone = '';
@@ -142,6 +163,21 @@ async function fetchAndRenderProperties() {
         console.error("Error fetching properties:", err);
     }
 }
+
+function reRenderProperties() {
+    const grid = document.querySelector('.properties__grid');
+    if (!grid) return;
+    let htmlStr = '';
+    let index = 0;
+    for (const prop of window.propertiesMap.values()) {
+        const delay = (index % 6) * 0.1;
+        htmlStr += renderPropertyCard(prop, delay);
+        index++;
+    }
+    grid.innerHTML = htmlStr;
+    document.dispatchEvent(new Event('propertiesLoaded'));
+}
+window.reRenderProperties = reRenderProperties;
 
 document.addEventListener('DOMContentLoaded', () => {
     fetchUsdRate();
