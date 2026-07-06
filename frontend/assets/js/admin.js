@@ -44,9 +44,11 @@ function renderTable() {
                 <td style="max-width: 300px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${prop.title}">${prop.title}</td>
                 <td><span style="background: #E5E7EB; padding: 4px 8px; border-radius: 4px; font-size: 12px;">${catText}</span></td>
                 <td>${prop.price}</td>
-                <td class="action-btns">
-                    <button class="btn btn-outline" onclick="editProperty('${prop.id}')">Редагувати</button>
-                    <button class="btn btn-danger" onclick="deleteProperty('${prop.id}')">Видалити</button>
+                <td>
+                    <div class="action-btns">
+                        <button class="btn btn-outline" onclick="editProperty('${prop.id}')">Редагувати</button>
+                        <button class="btn btn-danger" onclick="deleteProperty('${prop.id}')">Видалити</button>
+                    </div>
                 </td>
             </tr>
         `;
