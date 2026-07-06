@@ -62,9 +62,22 @@ function renderPropertyCard(prop, delay) {
         .replace(/,(\s*,)+/g, ',')          // Remove duplicate commas
         .replace(/^[\s,]+|[\s,]+$/g, '')    // Remove leading/trailing commas and spaces
         .trim();
+        
+    // Infer category if missing or needed for filtering
+    let category = prop.category || 'all';
+    const lowerTitle = normalizedTitle.toLowerCase();
+    if (lowerTitle.includes('квартир')) {
+        category = 'apartment';
+    } else if (lowerTitle.includes('будинок') || lowerTitle.includes('котедж') || lowerTitle.includes('таунхаус') || lowerTitle.includes('дуплекс')) {
+        category = 'house';
+    } else if (lowerTitle.includes('ділянк') || lowerTitle.includes('земл')) {
+        category = 'land';
+    } else if (lowerTitle.includes('комерц') || lowerTitle.includes('приміщення') || lowerTitle.includes('офіс') || lowerTitle.includes('склад')) {
+        category = 'commercial';
+    }
 
     return `
-    <div class="property-card fade-in" style="transition-delay: ${delay}s;" data-category="${prop.category}" data-id="${prop.id}">
+    <div class="property-card fade-in" style="transition-delay: ${delay}s;" data-category="${category}" data-id="${prop.id}">
         <div class="property-card__image-wrapper" onclick="if('${domRiaUrl}' !== '#') window.open('${domRiaUrl}', '_blank')" style="cursor: pointer;">
             <img src="${prop.image}" alt="${normalizedTitle}" class="property-card__image">
             <div class="prop-badges-top">

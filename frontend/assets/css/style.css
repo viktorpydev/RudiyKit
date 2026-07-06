@@ -558,6 +558,177 @@ img {
 }
 
 /* Properties Section */
+/* Modern Filters UI */
+.modern-filters-bar {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2.5rem;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    position: relative;
+    z-index: 101;
+}
+
+.modern-filter {
+    position: relative;
+}
+
+.modern-filter-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--clr-white);
+    border: 1px solid #e0e0e0;
+    border-radius: 50px;
+    padding: 0.6rem 1.25rem;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--clr-text);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.modern-filter-btn:hover {
+    border-color: var(--clr-primary);
+    box-shadow: 0 4px 12px rgba(242, 106, 54, 0.1);
+}
+
+.modern-filter-btn.active {
+    border-color: var(--clr-primary);
+    background-color: #fff9f6;
+    color: var(--clr-primary);
+}
+
+.modern-filter-btn .chevron {
+    margin-left: 4px;
+    transition: transform 0.3s ease;
+}
+
+.modern-filter-btn.active .chevron {
+    transform: rotate(180deg);
+}
+
+.modern-filter-dropdown {
+    position: absolute;
+    top: calc(100% + 10px);
+    left: 0;
+    background: var(--clr-white);
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    min-width: 200px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+    z-index: 110;
+    padding: 10px;
+}
+
+.modern-filter-dropdown.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.modern-filter-option {
+    padding: 10px 15px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s;
+    font-weight: 500;
+}
+
+.modern-filter-option:hover {
+    background: #f5f5f5;
+}
+
+.modern-filter-option.selected {
+    background: #fff9f6;
+    color: var(--clr-primary);
+}
+
+/* Dual Range Slider Styles */
+.price-inputs {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.price-input-group label {
+    font-size: 12px;
+    color: #777;
+    margin-bottom: 5px;
+    display: block;
+}
+
+.price-input-group input {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.price-input-group input:focus {
+    border-color: var(--clr-primary);
+}
+
+.price-slider-container {
+    position: relative;
+    width: 100%;
+    height: 30px;
+    margin-bottom: 10px;
+}
+
+.price-slider-track {
+    position: absolute;
+    width: 100%;
+    height: 6px;
+    background-color: #ddd;
+    border-radius: 3px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+}
+
+.price-slider-container input[type="range"] {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: none;
+    pointer-events: none;
+    -webkit-appearance: none;
+    appearance: none;
+    top: 0;
+    margin: 0;
+}
+
+.price-slider-container input[type="range"]::-webkit-slider-thumb {
+    height: 20px;
+    width: 20px;
+    border-radius: 50%;
+    background: var(--clr-primary);
+    pointer-events: auto;
+    -webkit-appearance: none;
+    box-shadow: 0 0 6px rgba(0,0,0,0.2);
+    cursor: pointer;
+    border: 2px solid white;
+}
+
+.price-slider-container input[type="range"]::-moz-range-thumb {
+    height: 20px;
+    width: 20px;
+    border-radius: 50%;
+    background: var(--clr-primary);
+    pointer-events: auto;
+    box-shadow: 0 0 6px rgba(0,0,0,0.2);
+    cursor: pointer;
+    border: 2px solid white;
+}
+
+
 /* New Filters UI */
 .filters-toolbar {
     position: relative;
@@ -644,6 +815,11 @@ img {
 .custom-dropdown {
     position: relative;
     width: 100%;
+}
+
+.sort-dropdown {
+    width: auto;
+    min-width: 200px;
 }
 
 .custom-dropdown__trigger {
