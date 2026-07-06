@@ -74,7 +74,7 @@ function renderPropertyCard(prop, delay) {
         phone = '+380688995435'; // Default agency phone
     }
 
-    const domRiaUrl = prop.url ? prop.url : '#';
+    const domRiaUrl = prop.url ? prop.url : 'https://dom.ria.com/uk/agency-26983.html';
     
     // Normalize title (remove extra spaces, double commas, leading/trailing commas)
     let normalizedTitle = prop.title
@@ -99,7 +99,7 @@ function renderPropertyCard(prop, delay) {
 
     return `
     <div class="property-card fade-in" style="transition-delay: ${delay}s;" data-category="${category}" data-id="${prop.id}">
-        <div class="property-card__image-wrapper" onclick="if('${domRiaUrl}' !== '#') window.open('${domRiaUrl}', '_blank')" style="cursor: pointer;">
+        <div class="property-card__image-wrapper" onclick="window.open('${domRiaUrl}', '_blank')" style="cursor: pointer;">
             <img src="${prop.image}" alt="${normalizedTitle}" class="property-card__image">
             <div class="prop-badges-top">
                 ${tagHtml}
@@ -110,7 +110,7 @@ function renderPropertyCard(prop, delay) {
             </button>
         </div>
         <div class="property-card__content">
-            <h3 class="property-card__title" onclick="if('${domRiaUrl}' !== '#') window.open('${domRiaUrl}', '_blank')" style="cursor: pointer;">${normalizedTitle}</h3>
+            <h3 class="property-card__title" onclick="window.open('${domRiaUrl}', '_blank')" style="cursor: pointer;">${normalizedTitle}</h3>
             <div class="prop-price-row">
                 <span class="prop-price">${displayPrice}</span>
                 ${m2PriceHtml}
@@ -121,7 +121,7 @@ function renderPropertyCard(prop, delay) {
             </div>
             <div class="prop-extra">${prop.extra || ''}</div>
             
-            <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 15px;">
+            <div style="display: flex; flex-direction: column; gap: 8px; margin-top: auto; padding-top: 15px;">
                 <a href="tel:${phone}" class="btn btn--primary prop-btn-full" style="text-align: center; display: flex; justify-content: center; align-items: center; gap: 8px;">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
                     Зателефонувати рієлтору
