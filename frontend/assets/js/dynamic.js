@@ -74,7 +74,7 @@ function renderPropertyCard(prop, delay) {
         phone = '+380688995435'; // Default agency phone
     }
 
-    const domRiaUrl = prop.url ? prop.url : 'https://dom.ria.com/uk/agency-26983.html';
+    const domRiaUrl = prop.domria_url ? prop.domria_url : (prop.url ? prop.url : 'https://dom.ria.com/uk/agency-26983.html');
     
     // Normalize title (remove extra spaces, double commas, leading/trailing commas)
     let normalizedTitle = prop.title
