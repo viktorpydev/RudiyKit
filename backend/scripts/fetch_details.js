@@ -1,4 +1,7 @@
-const puppeteer = require('puppeteer');
+const puppeteer = require('puppeteer-extra');
+const StealthPlugin = require('puppeteer-extra-plugin-stealth');
+puppeteer.use(StealthPlugin());
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 const { createClient } = require('@supabase/supabase-js');
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
@@ -107,13 +110,53 @@ async function fetchDetails() {
                 const titleNode = document.querySelector('h1');
                 const priceNode = document.querySelector('.price');
                 
-                // Description can be in various places
-                let descNode = document.querySelector('#description .text');
-                if (!descNode) descNode = document.querySelector('#description');
-                if (!descNode) descNode = document.querySelector('.description-text');
-                if (!descNode) descNode = document.querySelector('.mb-20.text-b');
-                if (!descNode) descNode = document.querySelector('.text-b');
+                const descTextEl = document.querySelector('#description .text, .description-text');
+                const cleanText = descTextEl ? descTextEl.innerText.replace(/Оголошення неактуальне.*/g, '').trim() : '';
+        
+                let area = '';
+                let floor = '';
+                let year = '';
                 
+                document.querySelectorAll('.chars-item, .flex.mt-15, .mt-15, li').forEach(el => {
+                    const t = el.innerText.trim();
+                    if (t.includes('Загальна площа')) area = t.replace('Загальна площа', '').trim().split('·')[0].trim();
+                    if (t.includes('Поверх')) floor = t.replace('Поверх:', '').replace('Поверх', '').trim();
+                    if (t.includes('Рік побудови') || t.includes('Рік забудови')) year = t.replace(/Рік (побудови|забудови):?/, '').trim();
+                });
+                
+                let infraHTML = [];
+                const infraHeader = Array.from(document.querySelectorAll('h2, h3, div')).find(el => el.innerText && el.innerText.includes('Інфраструктура'));
+                if (infraHeader) {
+                    let container = infraHeader.parentElement;
+                    while(container && container.tagName !== 'SECTION' && !container.className.includes('container')) {
+                        container = container.parentElement;
+                    }
+                    if (container) {
+                        container.querySelectorAll('.infrastructure-item, .item').forEach(item => {
+                            let type = item.querySelector('.title, b, strong')?.innerText || '';
+                            let time = item.querySelector('.distance, .time')?.innerText || '';
+                            if (type && type.length < 50) infraHTML.push({ type: type.trim(), time: time.trim() });
+                        });
+                    }
+                }
+                
+                const uniqueInfra = [];
+                const seen = new Set();
+                for(const i of infraHTML) {
+                    if (i.type && !seen.has(i.type)) {
+                        seen.add(i.type);
+                        uniqueInfra.push(i);
+                    }
+                }
+
+                let fullDescription = JSON.stringify({
+                    text: cleanText,
+                    area,
+                    floor,
+                    year,
+                    infra: uniqueInfra
+                });
+
                 const realtorLink = document.querySelector('a[href*="/realtor-"]');
                 
                 let realtorId = null;
@@ -128,7 +171,7 @@ async function fetchDetails() {
                 return {
                     title: titleNode ? titleNode.innerText.trim() : '',
                     price: priceNode ? priceNode.innerText.trim() : '',
-                    description: descNode ? descNode.innerText.trim() : '',
+                    description: fullDescription,
                     realtorId,
                     realtorName
                 };
@@ -158,11 +201,15 @@ async function fetchDetails() {
             const scrapedPrices = extractPrices(propData.price);
             let bestMatch = null;
 
-            // Strategy 1: Title word overlap + Price
-            for (const dbProp of dbProps) {
-                if (dbProp.domria_url) continue; // Already updated
+            // Strategy 0: Exact domria_url match
+            bestMatch = dbProps.find(p => p.domria_url === targetUrl);
 
-                const dbPrices = extractPrices(dbProp.price);
+            // Strategy 1: Title word overlap + Price
+            if (!bestMatch) {
+                for (const dbProp of dbProps) {
+                    if (dbProp.domria_url) continue; // Already matched to something else
+
+                    const dbPrices = extractPrices(dbProp.price);
                 if (scrapedPrices.size === 0 || dbPrices.size === 0 || !pricesMatch(scrapedPrices, dbPrices)) continue;
 
                 const scrapedWords = propData.title.toLowerCase().split(/\s+/).filter(w => w.length > 3);
@@ -185,6 +232,8 @@ async function fetchDetails() {
                 if (priceMatches.length === 1) {
                     bestMatch = priceMatches[0];
                 }
+            }
+
             }
 
             if (bestMatch) {

@@ -9,8 +9,9 @@ async function loadProperties() {
     const tbody = document.getElementById('propertiesTableBody');
     tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 20px;">Завантаження...</td></tr>';
     
-    const { data, error } = await supabase.from('properties')
+    const { data, error } = await supabaseClient.from('properties')
         .select('*')
+        .order('order_index', { ascending: true })
         .order('created_at', { ascending: false });
 
     if (error) {
@@ -32,22 +33,70 @@ function renderTable() {
     }
 
     currentProperties.forEach(prop => {
-        const tr = document.createElement('tr');
-        
         const catText = prop.category === 'sale' ? 'Продаж' : 'Оренда';
         
-        tr.innerHTML = `
-            <td><img src="${prop.image || 'https://via.placeholder.com/60x40?text=No+Image'}" alt="Photo"></td>
-            <td style="max-width: 300px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${prop.title}">${prop.title}</td>
-            <td><span style="background: #E5E7EB; padding: 4px 8px; border-radius: 4px; font-size: 12px;">${catText}</span></td>
-            <td>${prop.price}</td>
-            <td class="action-btns">
-                <button class="btn btn-outline" onclick="editProperty('${prop.id}')">Редагувати</button>
-                <button class="btn btn-danger" onclick="deleteProperty('${prop.id}')">Видалити</button>
-            </td>
+        tbody.innerHTML += `
+            <tr data-id="${prop.id}">
+                <td style="text-align: center; cursor: grab; color: #9CA3AF;" class="drag-handle">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="8" x2="20" y2="8"></line><line x1="4" y1="16" x2="20" y2="16"></line></svg>
+                </td>
+                <td><img src="${prop.image || 'https://via.placeholder.com/60x40?text=No+Image'}" alt="Photo"></td>
+                <td style="max-width: 300px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${prop.title}">${prop.title}</td>
+                <td><span style="background: #E5E7EB; padding: 4px 8px; border-radius: 4px; font-size: 12px;">${catText}</span></td>
+                <td>${prop.price}</td>
+                <td class="action-btns">
+                    <button class="btn btn-outline" onclick="editProperty('${prop.id}')">Редагувати</button>
+                    <button class="btn btn-danger" onclick="deleteProperty('${prop.id}')">Видалити</button>
+                </td>
+            </tr>
         `;
-        tbody.appendChild(tr);
     });
+
+    // Initialize SortableJS
+    Sortable.create(tbody, {
+        handle: '.drag-handle',
+        animation: 150,
+        ghostClass: 'sortable-ghost',
+        onEnd: async function (evt) {
+            const itemEl = evt.item;
+            const newIndex = evt.newIndex;
+            await updatePropertiesOrder();
+        }
+    });
+}
+
+async function updatePropertiesOrder() {
+    const tbody = document.getElementById('propertiesTableBody');
+    const rows = tbody.querySelectorAll('tr[data-id]');
+    
+    // Construct updates array
+    const updates = Array.from(rows).map((row, index) => {
+        return {
+            id: row.getAttribute('data-id'),
+            order_index: index
+        };
+    });
+
+    // Supabase JS doesn't support bulk update natively in a single call easily without a custom RPC function, 
+    // so we can loop or use upsert. Upsert works if we provide the full row or if we just want to update existing.
+    // However, for safety and simplicity with fewer rows, a loop is fine.
+    
+    // Visual feedback
+    document.body.style.cursor = 'wait';
+    try {
+        for (const update of updates) {
+            await supabaseClient.from('properties')
+                .update({ order_index: update.order_index })
+                .eq('id', update.id);
+        }
+    } catch (e) {
+        console.error('Failed to update order', e);
+        alert('Помилка при збереженні порядку: ' + e.message);
+    } finally {
+        document.body.style.cursor = 'default';
+        // Reload to sync currentProperties array
+        await loadProperties();
+    }
 }
 
 function openModal() {
@@ -92,7 +141,7 @@ function editProperty(id) {
 async function deleteProperty(id) {
     if (!confirm('Ви впевнені, що хочете видалити цей об\'єкт? Цю дію неможливо скасувати.')) return;
 
-    const { error } = await supabase.from('properties').delete().eq('id', id);
+    const { error } = await supabaseClient.from('properties').delete().eq('id', id);
     if (error) {
         alert('Помилка видалення: ' + error.message);
     } else {
@@ -115,13 +164,13 @@ async function previewImage(input) {
 async function uploadImageFile(file) {
     const fileName = 'img_' + Date.now() + '_' + Math.random().toString(36).substring(7) + '.jpg';
     
-    const { data, error } = await supabase.storage
+    const { data, error } = await supabaseClient.storage
         .from('property_images')
         .upload(fileName, file, { cacheControl: '3600', upsert: false });
         
     if (error) throw error;
     
-    const { data: publicUrlData } = supabase.storage
+    const { data: publicUrlData } = supabaseClient.storage
         .from('property_images')
         .getPublicUrl(fileName);
         
@@ -174,11 +223,11 @@ async function saveProperty(e) {
 
         if (id) {
             // Update
-            const { error } = await supabase.from('properties').update(payload).eq('id', id);
+            const { error } = await supabaseClient.from('properties').update(payload).eq('id', id);
             if (error) throw error;
         } else {
             // Insert
-            const { error } = await supabase.from('properties').insert([payload]);
+            const { error } = await supabaseClient.from('properties').insert([payload]);
             if (error) throw error;
         }
 

@@ -1483,12 +1483,29 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!document.querySelector('.properties__grid')) {
                 window.location.href = `catalog.html?category=${selectedCat}&query=${encodeURIComponent(query)}`;
             } else {
-                // If already on catalog, just apply filters
-                filterBtns.forEach(b => b.classList.remove('active'));
-                const targetBtn = document.querySelector(`.filter-btn[data-filter="${selectedCat}"]`);
-                if(targetBtn) targetBtn.classList.add('active');
+                // Update modern filter state
+                if (typeof filterState !== 'undefined') {
+                    filterState.category = selectedCat;
+                    // Update category dropdown UI
+                    const catFilter = document.getElementById('filterCategory');
+                    if (catFilter) {
+                        const options = catFilter.querySelectorAll('.modern-filter-option');
+                        let labelText = 'Усі типи';
+                        options.forEach(opt => {
+                            opt.classList.remove('selected');
+                            if (opt.getAttribute('data-value') === selectedCat) {
+                                opt.classList.add('selected');
+                                labelText = opt.innerText;
+                            }
+                        });
+                        const labelEl = catFilter.querySelector('.modern-filter-label');
+                        if (labelEl) labelEl.innerText = labelText;
+                    }
+                }
                 
-                applyFilters(selectedCat, query);
+                if (typeof triggerFiltersUpdate === 'function') {
+                    triggerFiltersUpdate();
+                }
             }
         });
     }
@@ -1498,25 +1515,37 @@ document.addEventListener('DOMContentLoaded', () => {
         const urlParams = new URLSearchParams(window.location.search);
         const urlCat = urlParams.get('category');
         const urlQuery = urlParams.get('query');
-        
-        let initialCat = 'all';
-        let initialQuery = '';
 
         if (urlCat) {
-            initialCat = urlCat;
-            filterBtns.forEach(b => b.classList.remove('active'));
-            const targetBtn = document.querySelector(`.filter-btn[data-filter="${initialCat}"]`);
-            if (targetBtn) targetBtn.classList.add('active');
+            if (typeof filterState !== 'undefined') {
+                filterState.category = urlCat;
+                // Update modern filter UI
+                const catFilter = document.getElementById('filterCategory');
+                if (catFilter) {
+                    const options = catFilter.querySelectorAll('.modern-filter-option');
+                    let labelText = 'Усі типи';
+                    options.forEach(opt => {
+                        opt.classList.remove('selected');
+                        if (opt.getAttribute('data-value') === urlCat) {
+                            opt.classList.add('selected');
+                            labelText = opt.innerText;
+                        }
+                    });
+                    const labelEl = catFilter.querySelector('.modern-filter-label');
+                    if (labelEl) labelEl.innerText = labelText;
+                }
+            }
         }
 
         if (urlQuery) {
-            initialQuery = urlQuery;
-            if (searchInput) searchInput.value = initialQuery;
+            if (searchInput) searchInput.value = urlQuery;
         }
 
         if (urlCat || urlQuery) {
             setTimeout(() => {
-                applyFilters(initialCat, initialQuery);
+                if (typeof triggerFiltersUpdate === 'function') {
+                    triggerFiltersUpdate();
+                }
             }, 50);
         }
     }
@@ -1611,8 +1640,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.addEventListener('propertiesLoaded', () => {
         propertyCards = Array.from(document.querySelectorAll('.property-card'));
-        if (typeof applyFilters === 'function') {
-            applyFilters('all', ''); // Or trigger it via current state
+        if (typeof triggerFiltersUpdate === 'function') {
+            triggerFiltersUpdate();
         }
     });
 

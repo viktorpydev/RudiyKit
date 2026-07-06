@@ -8,9 +8,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
     <!-- Supabase JS -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- SortableJS -->
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
     <link rel="stylesheet" href="assets/css/admin.css">
     <!-- Hide body by default until auth check passes -->
-    <style> body { display: none; } </style>
+    <style> /* body { display: none; } */ </style>
 </head>
 <body>
 
@@ -48,6 +50,7 @@
                 <table class="data-table">
                     <thead>
                         <tr>
+                            <th style="width: 40px;"></th>
                             <th>Фото</th>
                             <th>Заголовок</th>
                             <th>Категорія</th>

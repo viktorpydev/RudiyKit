@@ -142,6 +142,7 @@ async function fetchAndRenderProperties() {
         const { data: properties, error } = await supabaseClient
             .from('properties')
             .select('*')
+            .order('order_index', { ascending: true })
             .order('created_at', { ascending: false });
 
         if (error) throw error;
