@@ -86,8 +86,8 @@ function switchTab(tab) {
     if (tab === 'properties') {
         document.getElementById('nav-properties').classList.add('active');
         document.getElementById('section-properties').style.display = 'block';
-        document.getElementById('page-title').textContent = 'Управління об\\'єктами';
-        document.getElementById('btn-add-item').innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg> Додати об\\'єкт';
+        document.getElementById('page-title').textContent = "Управління об'єктами";
+        document.getElementById('btn-add-item').innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg> Додати об'єкт`;
         document.getElementById('btn-add-item').onclick = openModal;
     } else {
         document.getElementById('nav-realtors').classList.add('active');
@@ -273,7 +273,7 @@ async function saveRealtor(e) {
 }
 
 async function deleteRealtor(id) {
-    if (!confirm('Ви впевнені, що хочете видалити цього рієлтора? Об\\'єкти, прив\\'язані до нього, залишаться, але без вказаного рієлтора.')) return;
+    if (!confirm("Ви впевнені, що хочете видалити цього рієлтора? Об'єкти, прив'язані до нього, залишаться, але без вказаного рієлтора.")) return;
 
     const { error } = await supabaseClient.from('realtors').delete().eq('id', id);
     if (error) {
