@@ -584,6 +584,7 @@ img {
     padding: 0.8rem 1.5rem;
     font-size: 1.05rem;
     font-weight: 500;
+    font-family: inherit;
     color: var(--clr-text);
     cursor: pointer;
     transition: all 0.3s ease;
