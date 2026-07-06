@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Адмін-панель - RedCat Estate</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Supabase JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="assets/css/admin.css">
+    <!-- Hide body by default until auth check passes -->
+    <style> body { display: none; } </style>
+</head>
+<body>
+
+    <div class="admin-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="index.html" class="logo">Red<span>Cat</span> Admin</a>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="#" class="nav-item active">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                    Об'єкти нерухомості
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="user-info" id="userInfo">realtor@...</div>
+                <button class="btn btn-outline" onclick="logout()" style="width: 100%;">Вийти</button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="topbar">
+                <h1>Управління об'єктами</h1>
+                <div class="topbar-actions">
+                    <button class="btn btn-primary" onclick="openModal()">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                        Додати об'єкт
+                    </button>
+                </div>
+            </header>
+
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Фото</th>
+                            <th>Заголовок</th>
+                            <th>Категорія</th>
+                            <th>Ціна</th>
+                            <th>Дії</th>
+                        </tr>
+                    </thead>
+                    <tbody id="propertiesTableBody">
+                        <tr><td colspan="5" style="text-align: center; padding: 20px;">Завантаження...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal Form -->
+    <div class="modal-overlay" id="propertyModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Додати новий об'єкт</h2>
+                <button class="close-btn" onclick="closeModal()">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+            </div>
+            
+            <!-- Quick Import from DOM.RIA -->
+            <div class="import-section">
+                <h3>Швидкий імпорт з DOM.RIA</h3>
+                <div style="display: flex; gap: 10px; margin-top: 10px;">
+                    <input type="text" id="domriaImportUrl" class="form-control" placeholder="https://dom.ria.com/uk/realty-...">
+                    <button class="btn btn-outline" onclick="importFromDomRia()" id="importBtn" style="white-space: nowrap;">Імпортувати дані</button>
+                </div>
+                <small style="color: #6B7280; margin-top: 5px; display: block;">Автоматично заповнить заголовок, ціну, характеристики та додасть посилання.</small>
+            </div>
+
+            <hr style="border: 0; border-top: 1px solid var(--border); margin: 20px 0;">
+
+            <form id="propertyForm" onsubmit="saveProperty(event)">
+                <input type="hidden" id="propId">
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Заголовок *</label>
+                        <input type="text" id="propTitle" class="form-control" required placeholder="Напр. Продаж 2к квартири...">
+                    </div>
+                </div>
+
+                <div class="form-row two-cols">
+                    <div class="form-group">
+                        <label>Категорія *</label>
+                        <select id="propCategory" class="form-control" required>
+                            <option value="sale">Продаж</option>
+                            <option value="rent">Оренда</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Ціна (форматований текст) *</label>
+                        <input type="text" id="propPrice" class="form-control" required placeholder="Напр. 55 000 $">
+                    </div>
+                </div>
+
+                <div class="form-row two-cols">
+                    <div class="form-group">
+                        <label>Локація (Адреса) *</label>
+                        <input type="text" id="propLocation" class="form-control" required placeholder="Напр. вул. Київська 45">
+                    </div>
+                    <div class="form-group">
+                        <label>Посилання на DOM.RIA (domria_url)</label>
+                        <input type="text" id="propDomriaUrl" class="form-control" placeholder="https://dom.ria.com/...">
+                    </div>
+                </div>
+
+                <div class="form-row two-cols">
+                    <div class="form-group">
+                        <label>Головне Фото *</label>
+                        <div class="image-upload-wrapper">
+                            <input type="file" id="propImageFile" accept="image/*" onchange="previewImage(this)">
+                            <img id="imagePreview" src="" alt="Preview" style="display: none; width: 100px; height: 100px; object-fit: cover; border-radius: 8px; margin-top: 10px;">
+                            <input type="hidden" id="propImageUrl"> <!-- For existing image URL -->
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Ціна за м² (необов'язково)</label>
+                        <input type="text" id="propPricePerM2" class="form-control" placeholder="Напр. 1 100 $ за м²">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Характеристики (JSON) *</label>
+                        <textarea id="propSpecs" class="form-control" rows="4" required placeholder='[{"icon": "🔲", "text": "50 м²"}, {"icon": "🏢", "text": "Поверх 2/9"}]'></textarea>
+                        <small style="color: #6B7280; margin-top: 5px; display: block;">Масив об'єктів {icon, text}. Іконки можна брати з емодзі.</small>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Детальний опис (JSON) *</label>
+                        <textarea id="propDescription" class="form-control" rows="4" required placeholder='{"text": "Світла квартира...", "area": "50 м²", "floor": "2/9", "year": "2010", "infra": []}'></textarea>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline" onclick="closeModal()">Скасувати</button>
+                    <button type="submit" class="btn btn-primary" id="saveBtn">Зберегти об'єкт</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="assets/js/auth.js"></script>
+    <script src="assets/js/admin.js"></script>
+</body>
+</html>
