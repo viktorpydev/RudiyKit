@@ -279,6 +279,13 @@ function editProperty(id) {
 function openRealtorModal() {
     document.getElementById('realtorForm').reset();
     document.getElementById('realtorId').value = '';
+    
+    // Clear realtor image preview and file upload
+    document.getElementById('realtorImagePreview').style.display = 'none';
+    document.getElementById('realtorImagePreview').src = '';
+    document.getElementById('realtorPhotoUrl').value = '';
+    document.getElementById('realtorImageFile').value = '';
+    
     document.getElementById('realtorModalTitle').textContent = 'Додати рієлтора';
     document.getElementById('realtorModal').classList.add('active');
 }
@@ -297,6 +304,11 @@ function editRealtor(id) {
     document.getElementById('realtorPhone').value = r.phone || '';
     document.getElementById('realtorPhotoUrl').value = r.photo_url || '';
     document.getElementById('realtorRiaId').value = r.ria_id || '';
+    
+    if (r.photo_url) {
+        document.getElementById('realtorImagePreview').src = r.photo_url;
+        document.getElementById('realtorImagePreview').style.display = 'block';
+    }
 }
 
 async function saveRealtor(e) {
@@ -306,11 +318,18 @@ async function saveRealtor(e) {
     saveBtn.textContent = 'Збереження...';
 
     try {
+        let photoUrl = document.getElementById('realtorPhotoUrl').value;
+        const fileInput = document.getElementById('realtorImageFile');
+        
+        if (fileInput.files.length > 0) {
+            photoUrl = await uploadImageFile(fileInput.files[0]);
+        }
+
         const id = document.getElementById('realtorId').value;
         const payload = {
             full_name: document.getElementById('realtorName').value,
             phone: document.getElementById('realtorPhone').value,
-            photo_url: document.getElementById('realtorPhotoUrl').value,
+            photo_url: photoUrl,
             ria_id: document.getElementById('realtorRiaId').value || null
         };
 
@@ -331,6 +350,19 @@ async function saveRealtor(e) {
         saveBtn.textContent = 'Зберегти';
     }
 }
+
+function previewRealtorImage(input) {
+    const file = input.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            document.getElementById('realtorImagePreview').src = e.target.result;
+            document.getElementById('realtorImagePreview').style.display = 'block';
+        }
+        reader.readAsDataURL(file);
+    }
+}
+window.previewRealtorImage = previewRealtorImage;
 
 async function deleteRealtor(id) {
     if (!confirm("Ви впевнені, що хочете видалити цього рієлтора? Об'єкти, прив'язані до нього, залишаться, але без вказаного рієлтора.")) return;

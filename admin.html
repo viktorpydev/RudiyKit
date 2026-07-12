@@ -257,14 +257,18 @@
                         <input type="text" class="form-control" id="realtorPhone">
                     </div>
                     <div class="form-group">
-                        <label class="form-label">URL фотографії</label>
-                        <input type="url" class="form-control" id="realtorPhotoUrl">
+                        <label class="form-label">Фотографія рієлтора</label>
+                        <div class="image-upload-wrapper">
+                            <input type="file" id="realtorImageFile" accept="image/*" onchange="previewRealtorImage(this)">
+                            <img id="realtorImagePreview" src="" alt="Preview" style="display: none; width: 100px; height: 100px; object-fit: cover; border-radius: 8px; margin-top: 10px;">
+                            <input type="hidden" id="realtorPhotoUrl"> <!-- For image URL -->
+                        </div>
                     </div>
-                    <div class="form-group">
+                    <div class="form-group" style="margin-bottom: 20px;">
                         <label class="form-label">ID на Dim.RIA (для синхронізації)</label>
                         <input type="text" class="form-control" id="realtorRiaId">
                     </div>
-                    <div class="modal-actions">
+                    <div class="modal-footer">
                         <button type="button" class="btn btn-outline" onclick="closeRealtorModal()">Скасувати</button>
                         <button type="submit" class="btn btn-primary" id="btnSaveRealtor">Зберегти</button>
                     </div>
