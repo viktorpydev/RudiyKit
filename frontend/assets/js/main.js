@@ -89,11 +89,15 @@ document.addEventListener('DOMContentLoaded', () => {
         return parseInt(priceText.replace(/\D/g, ''), 10) || 0;
     }
 
-    function applyFilters(query = '', fallback = false) {
+    function applyFilters(query = '', fallback = false, isPaginationClick = false) {
         if (!propertyCards || !propertyCards.length) return;
         
         const lowerQuery = query ? query.toLowerCase() : '';
         let visibleCount = 0;
+
+        if (typeof window.visibleLimit === 'undefined' || !isPaginationClick) {
+            window.visibleLimit = 15;
+        }
         
         // Sorting
         if (sortSelect && !fallback) {
@@ -159,11 +163,17 @@ document.addEventListener('DOMContentLoaded', () => {
             if (card.showTimeoutId) clearTimeout(card.showTimeoutId);
 
             if (catMatch && queryMatch && districtMatch && priceMatch && opMatch) {
-                card.style.display = 'flex';
-                card.showTimeoutId = setTimeout(() => {
-                    card.style.opacity = '1';
-                    card.style.transform = 'scale(1)';
-                }, 10);
+                if (visibleCount < window.visibleLimit) {
+                    card.style.display = 'flex';
+                    card.showTimeoutId = setTimeout(() => {
+                        card.style.opacity = '1';
+                        card.style.transform = 'scale(1)';
+                    }, 10);
+                } else {
+                    card.style.display = 'none';
+                    card.style.opacity = '0';
+                    card.style.transform = 'scale(0.9)';
+                }
                 visibleCount++;
             } else {
                 card.style.opacity = '0';
@@ -173,6 +183,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 }, 300);
             }
         });
+
+        // Toggle "Load More" button container visibility
+        const loadMoreContainer = document.querySelector('.load-more-container');
+        if (loadMoreContainer) {
+            if (visibleCount > window.visibleLimit) {
+                loadMoreContainer.style.display = 'block';
+            } else {
+                loadMoreContainer.style.display = 'none';
+            }
+        }
 
         // Nearby logic
         // Nearby / Not found logic
@@ -221,6 +241,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Make triggerFiltersUpdate available globally for dynamic.js
     window.triggerFiltersUpdate = triggerFiltersUpdate;
+
+    // Load More Button Setup
+    const loadMoreBtn = document.getElementById('loadMoreBtn');
+    if (loadMoreBtn) {
+        loadMoreBtn.addEventListener('click', () => {
+            window.visibleLimit = (window.visibleLimit || 15) + 3;
+            const currentQuery = document.getElementById('search-input') ? document.getElementById('search-input').value.trim() : '';
+            applyFilters(currentQuery, false, true);
+        });
+    }
 
     // Currency Toggle Logic
     window.currentCurrency = 'USD'; // Default

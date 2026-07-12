@@ -4,6 +4,13 @@ let currentRealtors = [];
 async function initAdmin(user) {
     document.getElementById('userInfo').textContent = user.email;
     await Promise.all([loadProperties(), loadRealtors()]);
+
+    const addInfraBtn = document.getElementById('addInfraBtn');
+    if (addInfraBtn) {
+        addInfraBtn.addEventListener('click', () => {
+            addInfraRow('', '');
+        });
+    }
 }
 
 async function loadProperties() {
@@ -183,6 +190,11 @@ function openModal() {
     document.getElementById('propImageUrl').value = '';
     document.getElementById('modalTitle').textContent = 'Додати новий об\'єкт';
     document.getElementById('domriaImportUrl').value = '';
+    
+    // Clear infra rows manually
+    const infraContainer = document.getElementById('infraRowsContainer');
+    if (infraContainer) infraContainer.innerHTML = '';
+    
     document.getElementById('propertyModal').classList.add('active');
 }
 
@@ -205,8 +217,56 @@ function editProperty(id) {
     document.getElementById('propDomriaUrl').value = prop.domria_url || prop.url || '';
     document.getElementById('propPricePerM2').value = prop.priceperm2 || '';
     
-    document.getElementById('propSpecs').value = JSON.stringify(prop.specs || [], null, 2);
-    document.getElementById('propDescription').value = typeof prop.description === 'string' ? prop.description : JSON.stringify(prop.description || {}, null, 2);
+    // specs parsing
+    let roomsText = '';
+    let floorText = '';
+    let areaText = '';
+    if (prop.specs && Array.isArray(prop.specs)) {
+        prop.specs.forEach(s => {
+            const iconHtml = s.icon || '';
+            const textStr = String(s.text || '');
+            if (iconHtml.includes('M3 9h18v10') || iconHtml.includes('🛏️') || textStr.includes('кімн.')) {
+                roomsText = textStr;
+            } else if (iconHtml.includes('M4 10v9') || iconHtml.includes('🏢') || iconHtml.includes('Поверх') || textStr.includes('поверх') || textStr.match(/^\d+$/) || textStr.includes('/')) {
+                floorText = textStr;
+            } else if (iconHtml.includes('M21 3H3v18') || iconHtml.includes('📐') || textStr.includes('м²')) {
+                areaText = textStr;
+            } else {
+                if (textStr.includes('кімн.')) roomsText = textStr;
+                else if (textStr.includes('м²')) areaText = textStr;
+                else floorText = textStr;
+            }
+        });
+    }
+    document.getElementById('propSpecRooms').value = roomsText;
+    document.getElementById('propSpecFloor').value = floorText;
+    document.getElementById('propSpecArea').value = areaText;
+
+    // description parsing
+    let descObj = { text: '', area: '', floor: '', year: '', infra: [] };
+    let rawDesc = prop.description || '';
+    if (rawDesc.trim().startsWith('{') && rawDesc.trim().endsWith('}')) {
+        try {
+            descObj = JSON.parse(rawDesc);
+        } catch(e) {}
+    } else {
+        descObj.text = rawDesc;
+    }
+
+    document.getElementById('propDescText').value = descObj.text || '';
+    document.getElementById('propDescArea').value = descObj.area || '';
+    document.getElementById('propDescFloor').value = descObj.floor || '';
+    document.getElementById('propDescYear').value = descObj.year || '';
+
+    // Render infra rows
+    const infraContainer = document.getElementById('infraRowsContainer');
+    if (infraContainer) {
+        infraContainer.innerHTML = '';
+        const infraArr = descObj.infra || [];
+        infraArr.forEach(inf => {
+            addInfraRow(inf.type, inf.time);
+        });
+    }
     
     if (prop.image) {
         document.getElementById('imagePreview').src = prop.image;
@@ -338,24 +398,64 @@ async function saveProperty(e) {
 
         const id = document.getElementById('propId').value;
         
-        let specs = [];
-        let description = {};
-        
-        try {
-            specs = JSON.parse(document.getElementById('propSpecs').value);
-        } catch(e) { throw new Error('Помилка в Характеристиках JSON'); }
-        
-        try {
-            // Keep description as string in DB since frontend parses it
-            description = document.getElementById('propDescription').value;
-            JSON.parse(description); // validate JSON
-        } catch(e) { throw new Error('Помилка в Описі JSON'); }
+        // Specs compilation
+        const specs = [];
+        const roomsVal = document.getElementById('propSpecRooms').value.trim();
+        const floorVal = document.getElementById('propSpecFloor').value.trim();
+        const areaVal = document.getElementById('propSpecArea').value.trim();
+
+        if (roomsVal) {
+            specs.push({
+                icon: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9h18v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9zm0 0V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v4"></path></svg>',
+                text: roomsVal
+            });
+        }
+        if (floorVal) {
+            specs.push({
+                icon: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 10v9a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-9"></path><path d="M22 10H2"></path><path d="M7 6v4"></path><path d="M17 6v4"></path><path d="M12 2v8"></path></svg>',
+                text: floorVal
+            });
+        }
+        if (areaVal) {
+            specs.push({
+                icon: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 3H3v18h18V3z"></path><path d="M21 3l-18 18"></path></svg>',
+                text: areaVal
+            });
+        }
+
+        // Description compilation
+        const infraRows = document.querySelectorAll('.infra-row');
+        const infra = [];
+        infraRows.forEach(row => {
+            const type = row.querySelector('.infra-type').value.trim();
+            const time = row.querySelector('.infra-time').value.trim();
+            if (type) {
+                infra.push({ type, time });
+            }
+        });
+
+        const descriptionObj = {
+            text: document.getElementById('propDescText').value,
+            area: document.getElementById('propDescArea').value.trim(),
+            floor: document.getElementById('propDescFloor').value.trim(),
+            year: document.getElementById('propDescYear').value.trim(),
+            infra: infra
+        };
+
+        const description = JSON.stringify(descriptionObj);
+
+        // Remove "м. Вінниця" from location field on save
+        const rawLocation = document.getElementById('propLocation').value.trim();
+        const cleanLocation = rawLocation
+            .replace(/,\s*м\.\s*Вінниця/gi, '')
+            .replace(/м\.\s*Вінниця/gi, '')
+            .trim();
 
         const payload = {
             title: document.getElementById('propTitle').value,
             category: document.getElementById('propCategory').value,
             price: document.getElementById('propPrice').value,
-            location: document.getElementById('propLocation').value,
+            location: cleanLocation || 'Невідома адреса',
             domria_url: document.getElementById('propDomriaUrl').value,
             priceperm2: document.getElementById('propPricePerM2').value,
             image: imageUrl,
@@ -400,7 +500,6 @@ async function importFromDomRia() {
     btn.textContent = 'Імпортування...';
 
     try {
-        // Use allOrigins as a CORS proxy to fetch HTML
         const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(urlInput)}`;
         const response = await fetch(proxyUrl);
         if (!response.ok) throw new Error('Помилка мережі при завантаженні');
@@ -420,8 +519,8 @@ async function importFromDomRia() {
         const priceUah = doc.querySelector('.price.size24 b, .price b');
         const priceUsd = doc.querySelector('.price.size14, .price-usd');
         if (priceUah) {
-            priceText = priceUah.textContent.replace(/\\s+/g, ' ').trim();
-            if (priceUsd) priceText += ' · ' + priceUsd.textContent.replace(/\\s+/g, ' ').trim();
+            priceText = priceUah.textContent.replace(/\s+/g, ' ').trim();
+            if (priceUsd) priceText += ' · ' + priceUsd.textContent.replace(/\s+/g, ' ').trim();
             document.getElementById('propPrice').value = priceText;
         }
 
@@ -443,11 +542,10 @@ async function importFromDomRia() {
             document.getElementById('propImageUrl').value = bigImg;
         }
 
-        // We can set default JSON specs
-        document.getElementById('propSpecs').value = JSON.stringify([
-            {"icon": "🔲", "text": "Площа уточнюється"},
-            {"icon": "🏢", "text": "Поверх уточнюється"}
-        ], null, 2);
+        // Set default specs values
+        document.getElementById('propSpecArea').value = "Площа уточнюється";
+        document.getElementById('propSpecFloor').value = "Поверх уточнюється";
+        document.getElementById('propSpecRooms').value = "";
 
         alert('Дані імпортовано! Будь ласка, перевірте їх і завантажте фото на сервер (якщо потрібно) при збереженні.');
     } catch (error) {
@@ -456,4 +554,23 @@ async function importFromDomRia() {
         btn.disabled = false;
         btn.textContent = 'Імпортувати дані';
     }
+}
+
+function addInfraRow(type = '', time = '') {
+    const container = document.getElementById('infraRowsContainer');
+    if (!container) return;
+    const row = document.createElement('div');
+    row.className = 'infra-row';
+    row.style.display = 'grid';
+    row.style.gridTemplateColumns = '1fr 1fr auto';
+    row.style.gap = '8px';
+    row.style.alignItems = 'center';
+    row.style.marginBottom = '8px';
+    
+    row.innerHTML = `
+        <input type="text" class="form-control infra-type" placeholder="напр. Супермаркет" value="${type.replace(/"/g, '&quot;')}">
+        <input type="text" class="form-control infra-time" placeholder="напр. 5 хв" value="${time.replace(/"/g, '&quot;')}">
+        <button type="button" style="padding: 6px 10px; background-color: #ef4444; color: white; border: none; border-radius: 4px; cursor: pointer;" onclick="this.parentElement.remove()">✕</button>
+    `;
+    container.appendChild(row);
 }

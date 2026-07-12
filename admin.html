@@ -175,16 +175,56 @@
 
                 <div class="form-row">
                     <div class="form-group">
-                        <label>Характеристики (JSON) *</label>
-                        <textarea id="propSpecs" class="form-control" rows="4" required placeholder='[{"icon": "🔲", "text": "50 м²"}, {"icon": "🏢", "text": "Поверх 2/9"}]'></textarea>
-                        <small style="color: #6B7280; margin-top: 5px; display: block;">Масив об'єктів {icon, text}. Іконки можна брати з емодзі.</small>
+                        <label style="font-weight: 600; margin-bottom: 8px;">Характеристики об'єкта</label>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 10px;">
+                            <div>
+                                <label style="font-size: 0.85rem; color: #555; display: block; margin-bottom: 4px;">Кількість кімнат</label>
+                                <input type="text" id="propSpecRooms" class="form-control" placeholder="напр. 3 кімн.">
+                            </div>
+                            <div>
+                                <label style="font-size: 0.85rem; color: #555; display: block; margin-bottom: 4px;">Поверх</label>
+                                <input type="text" id="propSpecFloor" class="form-control" placeholder="напр. 4/9">
+                            </div>
+                            <div>
+                                <label style="font-size: 0.85rem; color: #555; display: block; margin-bottom: 4px;">Площа</label>
+                                <input type="text" id="propSpecArea" class="form-control" placeholder="напр. 75 м²">
+                            </div>
+                        </div>
                     </div>
                 </div>
 
                 <div class="form-row">
                     <div class="form-group">
-                        <label>Детальний опис (JSON) *</label>
-                        <textarea id="propDescription" class="form-control" rows="4" required placeholder='{"text": "Світла квартира...", "area": "50 м²", "floor": "2/9", "year": "2010", "infra": []}'></textarea>
+                        <label style="font-weight: 600; margin-bottom: 8px;">Детальний опис</label>
+                        <textarea id="propDescText" class="form-control" rows="3" placeholder="Світла квартира, гарний краєвид..." required></textarea>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label style="font-weight: 600; margin-bottom: 8px;">Характеристики в описі (modal pills)</label>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px;">
+                            <div>
+                                <label style="font-size: 0.85rem; color: #555; display: block; margin-bottom: 4px;">Площа</label>
+                                <input type="text" id="propDescArea" class="form-control" placeholder="напр. 75 м²">
+                            </div>
+                            <div>
+                                <label style="font-size: 0.85rem; color: #555; display: block; margin-bottom: 4px;">Поверх</label>
+                                <input type="text" id="propDescFloor" class="form-control" placeholder="напр. 4/9">
+                            </div>
+                            <div>
+                                <label style="font-size: 0.85rem; color: #555; display: block; margin-bottom: 4px;">Рік забудови</label>
+                                <input type="text" id="propDescYear" class="form-control" placeholder="напр. 2015">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label style="font-weight: 600; margin-bottom: 8px; display: block;">Інфраструктура поруч</label>
+                        <div id="infraRowsContainer" style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px;"></div>
+                        <button type="button" class="btn btn-outline" id="addInfraBtn" style="padding: 6px 12px; font-size: 0.85rem; width: auto; display: inline-block;">+ Додати інфраструктуру</button>
                     </div>
                 </div>
 
